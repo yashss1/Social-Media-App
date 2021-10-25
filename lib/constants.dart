@@ -6,6 +6,8 @@ Color primaryGreen = Color(0xff67cce6);
 Color secondary = Color(0xffcaeded);
 Color black = Colors.black;
 Color white = Colors.white;
+final Color grey = Color(0xff2E4053);
+final Color pink = Color.fromRGBO(255, 79, 90, 1);
 
 List<BoxShadow> shadowList = [
   BoxShadow(

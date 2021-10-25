@@ -8,6 +8,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  get: ^4.3.8
 
 dev_dependencies:
   flutter_test:
@@ -29,4 +30,5 @@ flutter:
           weight: 700
         - asset: assets/fonts/Lato-Regular.ttf
           weight: 400
+        - asset: assets/fonts/Lato-Italic.ttf
 
