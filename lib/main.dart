@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_media/Registration%20Screens/login_page.dart';
+import 'package:social_media/Verification%20Screens/verification_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      home: const MainRegistration(),
     );
   }
 }
