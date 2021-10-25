@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Button1 extends StatelessWidget {
-  const Button1({Key? key, required this.name, required this.width})
+  const Button1(
+      {Key? key, required this.name, required this.width})
       : super(key: key);
 
   final String name;

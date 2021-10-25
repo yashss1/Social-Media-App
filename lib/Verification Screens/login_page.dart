@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:social_media/DashBoard%20Screens/home.dart';
 import 'package:social_media/model/button1.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/icon_button.dart';
@@ -88,7 +90,22 @@ class LoginPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: deviceHeight * 0.05),
-            Button1(name: 'LOGIN', width: deviceWidth * 0.9),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return HomePage();
+                    },
+                  ),
+                );
+              },
+              child: Button1(
+                name: 'LOGIN',
+                width: deviceWidth * 0.9,
+              ),
+            ),
             SizedBox(height: deviceHeight * 0.05),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
