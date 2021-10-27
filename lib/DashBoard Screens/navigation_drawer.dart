@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media/Nav%20Drawer%20Screens/signature_kids.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/navigation_elements.dart';
 
@@ -38,7 +39,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             SizedBox(height: 25),
             SingleChildScrollView(
               child: Column(
-                children: const [
+                children: [
                   NavigationElement(
                       name: 'Home', icon: Icons.home, color1: Colors.black),
                   NavigationElement(
@@ -49,10 +50,22 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                       name: 'Games',
                       icon: Icons.videogame_asset_sharp,
                       color1: Colors.black),
-                  NavigationElement(
-                    name: 'Signature for Kids',
-                    icon: Icons.slideshow_sharp,
-                    color1: Colors.pink,
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return SignatureKids();
+                          },
+                        ),
+                      );
+                    },
+                    child: NavigationElement(
+                      name: 'Signature for Kids',
+                      icon: Icons.slideshow_sharp,
+                      color1: Colors.pink,
+                    ),
                   ),
                   NavigationElement(
                       name: 'Stream',
