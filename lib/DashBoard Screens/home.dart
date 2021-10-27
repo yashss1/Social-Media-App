@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   padding: EdgeInsets.all(16),
                   width: deviceWidth * 0.9,
-                  height: 80,
+                  height: 70,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(43),
