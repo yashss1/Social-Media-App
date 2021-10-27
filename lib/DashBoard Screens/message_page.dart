@@ -10,8 +10,21 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.purple,
+    return const Scaffold(
+      body: Center(
+        child: Text(
+          'Message Page',
+          textAlign: TextAlign.left,
+          style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Lato',
+              fontSize: 20,
+              letterSpacing:
+                  0 /*percentages not used in flutter. defaulting to zero*/,
+              fontWeight: FontWeight.normal,
+              height: 1),
+        ),
+      ),
     );
   }
 }

@@ -10,6 +10,21 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.green,);
+    return const Scaffold(
+      body: Center(
+        child: Text(
+          'Search Page',
+          textAlign: TextAlign.left,
+          style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Lato',
+              fontSize: 20,
+              letterSpacing:
+                  0 /*percentages not used in flutter. defaulting to zero*/,
+              fontWeight: FontWeight.normal,
+              height: 1),
+        ),
+      ),
+    );
   }
 }
