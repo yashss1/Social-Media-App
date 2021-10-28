@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media/model/comment_model.dart';
 import 'package:social_media/model/story_model.dart';
 
 class Home extends StatefulWidget {
@@ -76,6 +77,7 @@ class _HomeState extends State<Home> {
             Expanded(
               child: Container(
                 child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
                   child: Column(
                     children: [
                       SizedBox(height: 15),
@@ -226,6 +228,11 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                       ),
+                      SizedBox(height: 25),
+                      CommentModel(),
+                      CommentModel(),
+                      CommentModel(),
+                      SizedBox(height: 100),
                     ],
                   ),
                 ),
