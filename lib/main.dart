@@ -8,6 +8,7 @@ import 'package:social_media/Nav%20Drawer%20Screens/podcast.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/shop.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/signature_kids.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/trends.dart';
+import 'package:social_media/Verification%20Screens/login_page.dart';
 import 'package:social_media/Verification%20Screens/verification_screen.dart';
 import 'package:social_media/constants.dart';
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Lato',
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const MainRegistration(),
     );
   }
 }
