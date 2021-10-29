@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/constants.dart';
+import 'package:social_media/model/live_event_video_model.dart';
 
 class LiveEvents extends StatefulWidget {
   const LiveEvents({Key? key}) : super(key: key);
@@ -41,14 +44,14 @@ class _LiveEventsState extends State<LiveEvents> {
                         ),
                         SizedBox(width: 25),
                         const Text(
-                          'Groups',
+                          'Live Events',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(255, 79, 90, 1),
                               fontFamily: 'Lato',
                               fontSize: 20,
                               letterSpacing:
-                              0 /*percentages not used in flutter. defaulting to zero*/,
+                                  0 /*percentages not used in flutter. defaulting to zero*/,
                               fontWeight: FontWeight.normal,
                               height: 1),
                         ),
@@ -67,10 +70,31 @@ class _LiveEventsState extends State<LiveEvents> {
               ),
               Expanded(
                 child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(
-                      children: [],
+                      children: [
+                        SizedBox(height: 30),
+                        LiveEventVideo(
+                            user_name: 'Justin Flom',
+                            live_watching: '617',
+                            heading: 'Live from Italy',
+                            img: 'assets/images/Rectangle91(1).png',
+                            user_dp: 'assets/images/Ellipse111.png'),
+                        LiveEventVideo(
+                            user_name: 'Yash Sonawane',
+                            live_watching: '817',
+                            heading: 'Indian Market',
+                            img: 'assets/images/Rectangle105.png',
+                            user_dp: 'assets/images/Rectangle36(1).png'),
+                        LiveEventVideo(
+                            user_name: 'Maria Chan',
+                            live_watching: '452',
+                            heading: 'Live from Poland',
+                            img: 'assets/images/Rectangle91(1).png',
+                            user_dp: 'assets/images/Ellipse129.png'),
+                      ],
                     ),
                   ),
                 ),
