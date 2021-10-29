@@ -41,14 +41,14 @@ class _MusicState extends State<Music> {
                         ),
                         SizedBox(width: 25),
                         const Text(
-                          'Groups',
+                          'Music',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(255, 79, 90, 1),
                               fontFamily: 'Lato',
                               fontSize: 20,
                               letterSpacing:
-                              0 /*percentages not used in flutter. defaulting to zero*/,
+                                  0 /*percentages not used in flutter. defaulting to zero*/,
                               fontWeight: FontWeight.normal,
                               height: 1),
                         ),
@@ -67,6 +67,7 @@ class _MusicState extends State<Music> {
               ),
               Expanded(
                 child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(

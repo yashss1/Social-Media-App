@@ -41,7 +41,7 @@ class _GamesState extends State<Games> {
                         ),
                         SizedBox(width: 25),
                         const Text(
-                          'Groups',
+                          'Games',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(255, 79, 90, 1),
@@ -67,6 +67,7 @@ class _GamesState extends State<Games> {
               ),
               Expanded(
                 child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(

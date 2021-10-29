@@ -57,16 +57,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   child: Column(
                     children: [
                       InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const Home();
-                              },
-                            ),
-                          );
-                        },
+                        onTap: () {},
                         child: const NavigationElement(
                             name: 'Home',
                             icon: Icons.home,
