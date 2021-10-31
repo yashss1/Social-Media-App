@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants.dart';
+import 'package:social_media/model/popular_streamers_model.dart';
+import 'package:social_media/model/top_games_model.dart';
+import 'package:social_media/model/trending_live_streams_model.dart';
 
 class Stream extends StatefulWidget {
   const Stream({Key? key}) : super(key: key);
@@ -72,6 +76,7 @@ class _StreamState extends State<Stream> {
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 30),
                         Container(
@@ -168,7 +173,139 @@ class _StreamState extends State<Stream> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 18),
+                        Container(
+                          width: deviceWidth,
+                          color: white,
+                          child: SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: const [
+                                TopGamesModel(
+                                    name: 'PUBG MOBILE',
+                                    img: 'assets/images/Rectangle61.png'),
+                                TopGamesModel(
+                                    name: 'FREE FIRE',
+                                    img: 'assets/images/Rectangle63.png'),
+                                TopGamesModel(
+                                    name: 'COD',
+                                    img: 'assets/images/Rectangle65.png'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 35),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Trending Live Streams',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontFamily: 'Lato',
+                                  fontSize: 22,
+                                  letterSpacing:
+                                      0 /*percentages not used in flutter. defaulting to zero*/,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1),
+                            ),
+                            Text(
+                              'Show all',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Color.fromRGBO(
+                                      255, 79, 90, 0.7900000214576721),
+                                  fontFamily: 'Lato',
+                                  fontSize: 14,
+                                  letterSpacing:
+                                      0 /*percentages not used in flutter. defaulting to zero*/,
+                                  fontWeight: FontWeight.normal,
+                                  height: 1),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 18),
+                        SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              TrendingLiveStreams(
+                                  thumbnail: 'assets/images/Rectangle67.png',
+                                  views: '80.9K',
+                                  user: 'InstaGamer',
+                                  video_name: 'Georgopol Survival Challenge',
+                                  user_dp: 'assets/images/Rectangle69.png'),
+                              TrendingLiveStreams(
+                                  thumbnail: 'assets/images/Rectangle71.png',
+                                  views: '79.4K',
+                                  user: 'YashGamer',
+                                  video_name: 'Heist Survival Challenge',
+                                  user_dp: 'assets/images/Rectangle73.png'),
+                              TrendingLiveStreams(
+                                  thumbnail: 'assets/images/Rectangle67.png',
+                                  views: '80.9K',
+                                  user: 'InstaGamer',
+                                  video_name: 'Georgopol Survival Challenge',
+                                  user_dp: 'assets/images/Rectangle69.png'),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 35),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Popular Streamers',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontFamily: 'Lato',
+                                  fontSize: 22,
+                                  letterSpacing:
+                                      0 /*percentages not used in flutter. defaulting to zero*/,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1),
+                            ),
+                            Text(
+                              'Show all',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Color.fromRGBO(
+                                      255, 79, 90, 0.7900000214576721),
+                                  fontFamily: 'Lato',
+                                  fontSize: 14,
+                                  letterSpacing:
+                                      0 /*percentages not used in flutter. defaulting to zero*/,
+                                  fontWeight: FontWeight.normal,
+                                  height: 1),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 18),
+                        Column(
+                          children: [
+                            PopularStreamersModel(
+                                name: 'LiveStreamer',
+                                followers: '5.1M',
+                                img: 'assets/images/Rectangle75.png'),
+                            PopularStreamersModel(
+                                name: 'Xfinity',
+                                followers: '121K',
+                                img: 'assets/images/Rectangle77.png'),
+                            PopularStreamersModel(
+                                name: 'LiveStreamer',
+                                followers: '5.1M',
+                                img: 'assets/images/Rectangle75.png'),
+                            PopularStreamersModel(
+                                name: 'Xfinity',
+                                followers: '121K',
+                                img: 'assets/images/Rectangle77.png'),
+                          ],
+                        ),
                       ],
                     ),
                   ),
