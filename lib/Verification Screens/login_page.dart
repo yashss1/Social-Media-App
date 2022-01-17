@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
-import 'package:social_media/Services/networking.dart';
+import 'package:social_media/Services/authentication_helper.dart';
+import 'package:social_media/Services/get_user_data.dart';
 import 'package:social_media/model/button1.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/icon_button.dart';
@@ -18,58 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool showSpinner = false;
-  void getData() async {
-    NetworkHelper networkHelper =
-    NetworkHelper('https://signaturestest.online/login.php');
-
-    var login_data = await networkHelper.login(email.text, password.text);
-    print(login_data);
-    if (login_data != null) {
-      setState(() {
-        showSpinner = false;
-      });
-      if(login_data['status']=='Successfully Logged In !'){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              login_data['status'],
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return HomePage();
-            },
-          ),
-        );
-      }
-      else{
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              login_data['status'],
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        );
-      }
-    } else {
-      setState(() {
-        showSpinner = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Error!!",
-            style: TextStyle(fontSize: 16),
-          ),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,10 +119,50 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   );
                 } else {
-                  setState(() {
-                    showSpinner = true;
-                  });
-                  getData();
+                   // Navigator.pushReplacement(
+                   //   context,
+                   //   MaterialPageRoute(
+                   //     builder: (context) {
+                   //       return HomePage();
+                   //     },
+                   //   ),
+                   // );
+
+                   setState(() {
+                     showSpinner = true;
+                   });
+                   AuthenticationHelper()
+                       .signIn(
+                       email: email.text,
+                       password: password.text)
+                       .then(
+                         (result) {
+                       if (result == null) {
+                         Navigator.pushReplacement(
+                           context,
+                           MaterialPageRoute(
+                             builder: (context) =>
+                                 GetUserData(),
+                           ),
+                         );
+                       } else {
+                         setState(() {
+                           showSpinner = false;
+                         });
+                         ScaffoldMessenger.of(context)
+                             .showSnackBar(
+                           SnackBar(
+                             content: Text(
+                               result,
+                               style:
+                               TextStyle(fontSize: 16),
+                             ),
+                           ),
+                         );
+                       }
+                       ;
+                     },
+                   );
                 }
               },
               child: Button1(
