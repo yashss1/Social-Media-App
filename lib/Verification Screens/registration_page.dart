@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
 import 'package:social_media/DashBoard%20Screens/home_page.dart';
-import 'package:social_media/Services/networking.dart';
+import 'package:social_media/Services/authentication_helper.dart';
+import 'package:social_media/Services/store_user_info.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/button1.dart';
 import 'package:social_media/model/icon_button.dart';
@@ -25,59 +26,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     TextEditingController userName = TextEditingController();
     TextEditingController password = TextEditingController();
     bool showSpinner = false;
-    void getData() async {
-      NetworkHelper networkHelper =
-          NetworkHelper('https://signaturestest.online/register.php');
-
-      var register_data = await networkHelper.register(
-          userName.text, fullName.text, email.text, password.text);
-      print(register_data);
-      if (register_data != null) {
-        setState(() {
-          showSpinner = false;
-        });
-        if(register_data['status']=='User Registered Successfully !'){
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                register_data['status'],
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return HomePage();
-              },
-            ),
-          );
-        }
-        else{
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                register_data['status'],
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          );
-        }
-      } else {
-        setState(() {
-          showSpinner = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Error!!",
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        );
-      }
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -159,10 +107,53 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     );
                   } else {
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return HomePage();
+                    //     },
+                    //   ),
+                    // );
+
                     setState(() {
                       showSpinner = true;
                     });
-                    getData();
+                    AuthenticationHelper()
+                        .signUp(
+                        email: email.text,
+                        password: password.text)
+                        .then(
+                          (result) {
+                        if (result == null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  StoreRegisterData(
+                                    password: password.text,
+                                    name: fullName.text,
+                                    username: userName.text,
+                                  ),
+                            ),
+                          );
+                        } else {
+                          setState(() {
+                            showSpinner = false;
+                          });
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                result,
+                                style: TextStyle(
+                                    fontSize: 16),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    );
                   }
                 },
                 child: Button1(
