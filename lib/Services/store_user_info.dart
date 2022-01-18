@@ -6,20 +6,22 @@ import 'authentication_helper.dart';
 import 'get_user_data.dart';
 
 class StoreRegisterData extends StatefulWidget {
-
-  const StoreRegisterData({Key? key, required this.password, required this.name, required this.username}) : super(key: key);
-  final String password, name, username;
+  const StoreRegisterData(
+      {Key? key,
+      required this.name,
+      required this.username})
+      : super(key: key);
+  final String name, username;
 
   @override
   State<StoreRegisterData> createState() => _StoreRegisterDataState();
 }
 
 class _StoreRegisterDataState extends State<StoreRegisterData> {
-
-  Future<String> getData() async{
+  Future<String> getData() async {
     String temp = "yash";
-    await AuthenticationHelper().storeUserDetails(
-        widget.password, widget.name, widget.username);
+    await AuthenticationHelper()
+        .storeUserDetails(widget.name, widget.username);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -31,20 +33,21 @@ class _StoreRegisterDataState extends State<StoreRegisterData> {
 
   @override
   Widget build(BuildContext context) {
-
     CollectionReference users = FirebaseFirestore.instance.collection('Users');
-    return FutureBuilder<String>(
-      future: getData(),
-      builder:
-          (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasError) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: FutureBuilder<String>(
+        future: getData(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return GetUserData();
+          }
           return Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          return GetUserData();
-        }
-        return Center(child: CircularProgressIndicator());
-      },
+        },
+      ),
     );
   }
 }

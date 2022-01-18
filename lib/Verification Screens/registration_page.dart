@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:social_media/DashBoard%20Screens/home.dart';
-import 'package:social_media/DashBoard%20Screens/home_page.dart';
 import 'package:social_media/Services/authentication_helper.dart';
 import 'package:social_media/Services/store_user_info.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/button1.dart';
-import 'package:social_media/model/icon_button.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -16,21 +13,21 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  TextEditingController email = TextEditingController();
+  TextEditingController fullName = TextEditingController();
+  TextEditingController userName = TextEditingController();
+  TextEditingController password = TextEditingController();
+  bool showSpinner = false;
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
 
-    TextEditingController email = TextEditingController();
-    TextEditingController fullName = TextEditingController();
-    TextEditingController userName = TextEditingController();
-    TextEditingController password = TextEditingController();
-    bool showSpinner = false;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ModalProgressHUD(
-        inAsyncCall: showSpinner,
+    return ModalProgressHUD(
+      inAsyncCall: showSpinner,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -69,7 +66,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
               SizedBox(height: deviceHeight * 0.05),
               InkWell(
-                onTap: () async {
+                onTap: () {
                   if (fullName.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -107,47 +104,32 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     );
                   } else {
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return HomePage();
-                    //     },
-                    //   ),
-                    // );
-
                     setState(() {
                       showSpinner = true;
                     });
                     AuthenticationHelper()
-                        .signUp(
-                        email: email.text,
-                        password: password.text)
+                        .signUp(email: email.text, password: password.text)
                         .then(
-                          (result) {
+                      (result) {
                         if (result == null) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  StoreRegisterData(
-                                    password: password.text,
-                                    name: fullName.text,
-                                    username: userName.text,
-                                  ),
+                              builder: (context) => StoreRegisterData(
+                                name: fullName.text,
+                                username: userName.text,
+                              ),
                             ),
                           );
                         } else {
                           setState(() {
                             showSpinner = false;
                           });
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(
+                          ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
                                 result,
-                                style: TextStyle(
-                                    fontSize: 16),
+                                style: TextStyle(fontSize: 16),
                               ),
                             ),
                           );
@@ -162,34 +144,34 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
               SizedBox(height: deviceHeight * 0.05),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'OR',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        color: Color.fromRGBO(0, 0, 0, 1),
-                        fontFamily: 'Lato',
-                        fontSize: 18,
-                        letterSpacing:
-                            0 /*percentages not used in flutter. defaulting to zero*/,
-                        fontWeight: FontWeight.bold,
-                        height: 1),
-                  )
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: const [
+              //     Text(
+              //       'OR',
+              //       textAlign: TextAlign.left,
+              //       style: TextStyle(
+              //           color: Color.fromRGBO(0, 0, 0, 1),
+              //           fontFamily: 'Lato',
+              //           fontSize: 18,
+              //           letterSpacing:
+              //               0 /*percentages not used in flutter. defaulting to zero*/,
+              //           fontWeight: FontWeight.bold,
+              //           height: 1),
+              //     )
+              //   ],
+              // ),
               SizedBox(height: deviceHeight * 0.06),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const [
-                    IconButton1(icons: 'assets/images/fb_icon.png'),
-                    IconButton1(icons: 'assets/images/google_icon.png'),
-                  ],
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 20),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //     children: const [
+              //       IconButton1(icons: 'assets/images/fb_icon.png'),
+              //       IconButton1(icons: 'assets/images/google_icon.png'),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_media/Verification%20Screens/login_page.dart';
+import 'package:social_media/Verification%20Screens/verification_screen.dart';
 
 class AuthenticationHelper {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -37,14 +37,15 @@ class AuthenticationHelper {
     print('signout');
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
-            (route) => false);
+        MaterialPageRoute(
+            builder: (BuildContext context) => MainRegistration()),
+        (route) => false);
   }
 
   //getUserDetails
-  Future<void> storeUserDetails(password, name, username) async {
+  Future<void> storeUserDetails(name, username) async {
     final CollectionReference userCollection =
-    FirebaseFirestore.instance.collection('Users');
+        FirebaseFirestore.instance.collection('Users');
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid.toString();
     String email = auth.currentUser!.email.toString();
@@ -52,18 +53,50 @@ class AuthenticationHelper {
     userCollection
         .doc(uid)
         .set({
-      "Info":{
-        "Name": name,
-        "Username": username,
-        "Email": email,
-        "Password": password,
-        "Uid": uid,
-        "IsAdmin": false,
-        "ProfilePhotoUrl": "https://freesvg.org/img/abstract-user-flat-4.png",
-      }
-    }, SetOptions(merge: true))
+          "Info": {
+            "Name": name,
+            "Username": username,
+            "Email": email,
+            "Uid": uid,
+            "IsAdmin": false,
+            "BgPhotoUrl":"https://img.freepik.com/free-photo/empty-wooden-blurred-nature-backdrop-wood-table-top_43620-5.jpg?size=626&ext=jpg",
+            "ProfilePhotoUrl":
+                "https://freesvg.org/img/abstract-user-flat-4.png",
+            "TagLine": "Husband,Father,Hard Worker",
+            "Profession": "AppUser",
+            "Location": "California, USA",
+            "DOB": "01/01/2000"
+          }
+        }, SetOptions(merge: true))
         .then((value) => print("User Details Added"))
         .catchError((error) => print("Failed to add user: $error"));
+
+    return;
+  }
+
+  // Update UserDetails
+  Future<void> updateUserDetails(
+      name, tagline, profession, date, location, imageUrl, bgImageUrl) async {
+    final CollectionReference userCollection =
+        FirebaseFirestore.instance.collection('Users');
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid.toString();
+
+    userCollection
+        .doc(uid)
+        .set({
+          "Info": {
+            "Name": name,
+            "TagLine": tagline,
+            "Profession": profession,
+            "Location": location,
+            "DOB": date,
+            "ProfilePhotoUrl" :imageUrl,
+            "BgPhotoUrl":bgImageUrl,
+          }
+        }, SetOptions(merge: true))
+        .then((value) => print("User Details Updated"))
+        .catchError((error) => print("Failed to Update user: $error"));
 
     return;
   }
