@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
+import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/friends_model.dart';
+import 'edit_profile.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key? key}) : super(key: key);
@@ -69,11 +72,15 @@ class _UserPageState extends State<UserPage> {
                               Container(
                                 width: deviceWidth,
                                 height: deviceHeight * 0.25,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: Color.fromRGBO(196, 196, 196, 1),
+                                  // image: DecorationImage(
+                                  //     image: AssetImage(
+                                  //         'assets/images/Rectangle10 (1).png'),
+                                  //     fit: BoxFit.fitWidth),
                                   image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/images/Rectangle10 (1).png'),
+                                      image: NetworkImage(
+                                          "${UserDetails.bgPhotoUrl}"),
                                       fit: BoxFit.fitWidth),
                                 ),
                               ),
@@ -85,57 +92,18 @@ class _UserPageState extends State<UserPage> {
                                       Container(
                                         width: 125,
                                         height: 122,
-                                        decoration: const BoxDecoration(
+                                        decoration: BoxDecoration(
                                           color:
                                               Color.fromRGBO(196, 196, 196, 1),
                                           image: DecorationImage(
-                                              image: AssetImage(
-                                                  'assets/images/Ellipse13.png'),
+                                              image: NetworkImage(
+                                                  "${UserDetails.profilePhotoUrl}"),
                                               fit: BoxFit.fitWidth),
                                           borderRadius: BorderRadius.all(
                                               Radius.elliptical(125, 122)),
                                         ),
                                       ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: -15,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                              right: 16, bottom: 10),
-                                          width: 35,
-                                          height: 35,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.elliptical(125, 122)),
-                                          ),
-                                          child: const Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
                                     ],
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Container(
-                                  margin:
-                                      EdgeInsets.only(right: 16, bottom: 60),
-                                  width: 35,
-                                  height: 35,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.all(
-                                        Radius.elliptical(125, 122)),
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 20,
                                   ),
                                 ),
                               ),
@@ -143,8 +111,8 @@ class _UserPageState extends State<UserPage> {
                           ),
                         ),
                         SizedBox(height: 25),
-                        const Text(
-                          'Jean Johnson',
+                        Text(
+                          "${UserDetails.name}",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
@@ -156,8 +124,8 @@ class _UserPageState extends State<UserPage> {
                               height: 1),
                         ),
                         SizedBox(height: 15),
-                        const Text(
-                          'Husband, Father, Hard Worker',
+                        Text(
+                          "${UserDetails.tagLine}",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
@@ -169,35 +137,47 @@ class _UserPageState extends State<UserPage> {
                               height: 1),
                         ),
                         SizedBox(height: 20),
-                        Container(
-                          width: 151,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return EditProfile();
+                                },
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 151,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                              color: const Color.fromRGBO(255, 255, 255, 1),
+                              border: Border.all(
+                                color: const Color.fromRGBO(0, 0, 0, 1),
+                                width: 1,
+                              ),
                             ),
-                            color: const Color.fromRGBO(255, 255, 255, 1),
-                            border: Border.all(
-                              color: const Color.fromRGBO(0, 0, 0, 1),
-                              width: 1,
-                            ),
-                          ),
-                          child: const Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Edit your profile',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
-                                  fontFamily: 'Lato',
-                                  fontSize: 16,
-                                  letterSpacing:
-                                      0 /*percentages not used in flutter. defaulting to zero*/,
-                                  fontWeight: FontWeight.normal,
-                                  height: 1),
+                            child: const Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Edit your profile',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 16,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1),
+                              ),
                             ),
                           ),
                         ),
@@ -211,7 +191,7 @@ class _UserPageState extends State<UserPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Work at:',
                                         textAlign: TextAlign.left,
@@ -226,7 +206,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        'Youtuber',
+                                        "${UserDetails.profession}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),
@@ -240,7 +220,7 @@ class _UserPageState extends State<UserPage> {
                                     ],
                                   ),
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Birthday :',
                                         textAlign: TextAlign.left,
@@ -255,7 +235,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        '08 / January / 1990',
+                                        "${UserDetails.dob}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),
@@ -305,7 +285,7 @@ class _UserPageState extends State<UserPage> {
                                     ],
                                   ),
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Live in :',
                                         textAlign: TextAlign.left,
@@ -320,7 +300,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        'California USA',
+                                        "${UserDetails.location}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),

@@ -13,6 +13,7 @@ import 'package:social_media/Nav%20Drawer%20Screens/signature_kids.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/stream.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/trends.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/videos.dart';
+import 'package:social_media/Services/authentication_helper.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/navigation_elements.dart';
 
@@ -296,10 +297,15 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                             icon: Icons.group,
                             color1: Colors.black),
                       ),
-                      NavigationElement(
-                          name: 'Log Out',
-                          icon: Icons.logout,
-                          color1: Colors.black),
+                      InkWell(
+                        onTap: () {
+                          AuthenticationHelper().signOut(context);
+                        },
+                        child: NavigationElement(
+                            name: 'Log Out',
+                            icon: Icons.logout,
+                            color1: Colors.black),
+                      ),
                     ],
                   ),
                 ),

@@ -6,4 +6,9 @@ class UserDetails {
   static bool? isAdmin;
   static String? uid;
   static String? profilePhotoUrl;
+  static String? bgPhotoUrl;
+  static String? tagLine;
+  static String? profession;
+  static String? dob;
+  static String? location;
 }

@@ -47,7 +47,7 @@ class CommentModel extends StatelessWidget {
                     height: 1),
               ),
               SizedBox(height: 5),
-              const Text(
+               Text(
                 '@dannygloves',
                 textAlign: TextAlign.left,
                 style: TextStyle(
