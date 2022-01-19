@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/OtherScreens/profile_page.dart';
 
 import '../constants.dart';
 
@@ -11,6 +13,19 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  TextEditingController search = TextEditingController();
+  String searchField = "";
+
+  bool resultData(List arr, int index, String _key) {
+    String email = arr[index]['Info']['Name'];
+    String name = arr[index]['Info']['Username'];
+    email = email.toLowerCase();
+    name = name.toLowerCase();
+    _key = _key.toLowerCase();
+    if (email.contains(_key) || name.contains(_key)) return true;
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -46,8 +61,12 @@ class _SearchPageState extends State<SearchPage> {
                       width: deviceWidth - 100,
                       child: TextField(
                         textAlign: TextAlign.start,
-                        onChanged: (value) {
-                          //Do something with the user input.
+                        controller: search,
+                        onChanged: (text) {
+                          setState(() {
+                            searchField = text;
+                            // print(searchField);
+                          });
                         },
                         decoration: kMessageTextFieldDecoration.copyWith(
                           hintText: "Search",
@@ -123,11 +142,27 @@ class _SearchPageState extends State<SearchPage> {
                               physics: BouncingScrollPhysics(),
                               itemCount: _snap.length,
                               itemBuilder: (context, index) {
-                                return item(
-                                    image: _snap[index]['Info']
-                                        ['ProfilePhotoUrl'],
-                                    name: _snap[index]['Info']['Name'],
-                                    username: _snap[index]['Info']['Username']);
+                                return (resultData(
+                                            _snap, index, searchField)) ==
+                                        false
+                                    ? SizedBox(height: 0)
+                                    : item(
+                                        image: _snap[index]['Info']
+                                            ['ProfilePhotoUrl'],
+                                        name: _snap[index]['Info']['Name'],
+                                        username: _snap[index]['Info']
+                                            ['Username'],
+                                        ontap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfilePage(
+                                                        array: _snap,
+                                                        index: index,
+                                                      )));
+                                        },
+                                      );
                               });
                     }),
               ),
@@ -152,7 +187,7 @@ class item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       width: MediaQuery.of(context).size.width,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,7 +200,8 @@ class item extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(100, 94, 94, 1),
                   image: DecorationImage(
-                      image: NetworkImage("${image}"), fit: BoxFit.fitWidth),
+                      image: CachedNetworkImageProvider("${image}"),
+                      fit: BoxFit.fitWidth),
                   borderRadius: BorderRadius.all(Radius.elliptical(36, 36)),
                 ),
               ),
@@ -220,19 +256,22 @@ class item extends StatelessWidget {
                 width: 1,
               ),
             ),
-            child: const Align(
+            child: Align(
               alignment: Alignment.center,
-              child: Text(
-                'View profile',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    fontFamily: 'Lato',
-                    fontSize: 16,
-                    letterSpacing:
-                        0 /*percentages not used in flutter. defaulting to zero*/,
-                    fontWeight: FontWeight.normal,
-                    height: 1),
+              child: InkWell(
+                onTap: ontap,
+                child: Text(
+                  'View profile',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'Lato',
+                      fontSize: 16,
+                      letterSpacing:
+                          0 /*percentages not used in flutter. defaulting to zero*/,
+                      fontWeight: FontWeight.normal,
+                      height: 1),
+                ),
               ),
             ),
           ),

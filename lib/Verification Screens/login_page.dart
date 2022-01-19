@@ -4,6 +4,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
 import 'package:social_media/Services/authentication_helper.dart';
 import 'package:social_media/Services/get_user_data.dart';
+import 'package:social_media/Verification%20Screens/forgot_pass.dart';
 import 'package:social_media/model/button1.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/icon_button.dart';
@@ -50,52 +51,29 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: deviceHeight * 0.015),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 18,
-                        height: 17,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(4),
-                            topRight: Radius.circular(4),
-                            bottomLeft: Radius.circular(4),
-                            bottomRight: Radius.circular(4),
-                          ),
-                          border: Border.all(
-                            color: const Color.fromRGBO(255, 79, 90, 1),
-                            width: 1,
-                          ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForgotPass(),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Remember me',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 1),
-                            fontFamily: 'Lato',
-                            fontSize: 14,
-                            letterSpacing:
-                                0 /*percentages not used in flutter. defaulting to zero*/,
-                            fontWeight: FontWeight.normal,
-                            height: 1),
-                      )
-                    ],
-                  ),
-                  const Text(
-                    'Forget password?',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        color: Color.fromRGBO(0, 0, 0, 1),
-                        fontFamily: 'Lato',
-                        fontSize: 14,
-                        letterSpacing:
-                            0 /*percentages not used in flutter. defaulting to zero*/,
-                        fontWeight: FontWeight.normal,
-                        height: 1),
+                      );
+                    },
+                    child: Text(
+                      'Forgot password?',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontFamily: 'Lato',
+                          fontSize: 14,
+                          letterSpacing:
+                              0 /*percentages not used in flutter. defaulting to zero*/,
+                          fontWeight: FontWeight.normal,
+                          height: 1),
+                    ),
                   ),
                 ],
               ),

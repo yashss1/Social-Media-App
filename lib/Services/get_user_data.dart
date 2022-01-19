@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
 import 'package:social_media/DashBoard%20Screens/home_page.dart';
 import 'package:social_media/Services/user_details.dart';
+import 'package:social_media/Verification%20Screens/phone_verification.dart';
 
 class GetUserData extends StatelessWidget {
   @override
@@ -40,6 +41,11 @@ class GetUserData extends StatelessWidget {
             UserDetails.profession = data['Info']['Profession'];
             UserDetails.dob = data['Info']['DOB'];
             UserDetails.location = data['Info']['Location'];
+            UserDetails.phone = data['Info']['PhoneNumber'];
+
+            if(UserDetails.phone=="0000000000"){
+              return PhoneVerify();
+            }
 
             return HomePage();
           }

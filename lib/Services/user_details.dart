@@ -11,4 +11,5 @@ class UserDetails {
   static String? profession;
   static String? dob;
   static String? location;
+  static String? phone;
 }

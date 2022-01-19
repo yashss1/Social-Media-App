@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/Services/authentication_helper.dart';
@@ -18,6 +19,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController userName = TextEditingController();
   TextEditingController password = TextEditingController();
   bool showSpinner = false;
+  bool flag = true;
+
+  Future<void> getData(String username) async {
+    final QuerySnapshot result =
+        await FirebaseFirestore.instance.collection('Users').get();
+    final List<DocumentSnapshot> documents = result.docs;
+
+    // Iterate through all the Documents
+    documents.forEach((data) {
+      bool docStatus = data.exists;
+      if (docStatus == true) {
+        if (data['Info']['Username'] == username) {
+          flag = false;
+          print("Username already present ${flag}");
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +85,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
               SizedBox(height: deviceHeight * 0.05),
               InkWell(
-                onTap: () {
+                onTap: () async {
                   if (fullName.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -104,38 +123,57 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     );
                   } else {
+                    flag = true;
                     setState(() {
                       showSpinner = true;
                     });
-                    AuthenticationHelper()
-                        .signUp(email: email.text, password: password.text)
-                        .then(
-                      (result) {
-                        if (result == null) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => StoreRegisterData(
-                                name: fullName.text,
-                                username: userName.text,
-                              ),
+                    await getData(userName.text).then((value) {
+                      print(flag);
+                      if (flag == true) {
+                        AuthenticationHelper()
+                            .signUp(email: email.text, password: password.text)
+                            .then(
+                          (result) {
+                            if (result == null) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StoreRegisterData(
+                                    name: fullName.text,
+                                    username: userName.text,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              setState(() {
+                                showSpinner = false;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    result,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Username ${userName.text} already Exists",
+                              style: TextStyle(fontSize: 16),
                             ),
-                          );
-                        } else {
-                          setState(() {
-                            showSpinner = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                result,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    );
+                          ),
+                        );
+                        print("Error");
+                        setState(() {
+                          showSpinner = false;
+                        });
+                      }
+                    });
                   }
                 },
                 child: Button1(
