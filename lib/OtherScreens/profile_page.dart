@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/friends_model.dart';
-import 'edit_profile.dart';
 
-class UserPage extends StatefulWidget {
-  const UserPage({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key, this.array, this.index}) : super(key: key);
+
+  final array, index;
 
   @override
-  _UserPageState createState() => _UserPageState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -31,10 +32,23 @@ class _UserPageState extends State<UserPage> {
                 height: 70,
                 color: Colors.white,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    InkWell(
+                      splashColor: Colors.pink,
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back,
+                        size: 28,
+                      ),
+                    ),
+                    SizedBox(
+                      width: deviceWidth * .30,
+                    ),
                     const Text(
-                      'Signature',
+                      'User',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           color: Color.fromRGBO(255, 79, 90, 1),
@@ -70,7 +84,7 @@ class _UserPageState extends State<UserPage> {
                                   //     fit: BoxFit.fitWidth),
                                   image: DecorationImage(
                                       image: CachedNetworkImageProvider(
-                                          "${UserDetails.bgPhotoUrl}"),
+                                          "${widget.array[widget.index]['Info']['BgPhotoUrl']}"),
                                       fit: BoxFit.fill),
                                 ),
                               ),
@@ -87,7 +101,7 @@ class _UserPageState extends State<UserPage> {
                                               Color.fromRGBO(196, 196, 196, 1),
                                           image: DecorationImage(
                                               image: CachedNetworkImageProvider(
-                                                  "${UserDetails.profilePhotoUrl}"),
+                                                  "${widget.array[widget.index]['Info']['ProfilePhotoUrl']}"),
                                               fit: BoxFit.fitWidth),
                                           borderRadius: BorderRadius.all(
                                               Radius.elliptical(125, 122)),
@@ -102,7 +116,7 @@ class _UserPageState extends State<UserPage> {
                         ),
                         SizedBox(height: 25),
                         Text(
-                          "${UserDetails.name}",
+                          "${widget.array[widget.index]['Info']['Name']}",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
@@ -115,7 +129,7 @@ class _UserPageState extends State<UserPage> {
                         ),
                         SizedBox(height: 15),
                         Text(
-                          "${UserDetails.tagLine}",
+                          "${widget.array[widget.index]['Info']['TagLine']}",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
@@ -128,16 +142,7 @@ class _UserPageState extends State<UserPage> {
                         ),
                         SizedBox(height: 20),
                         InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return EditProfile();
-                                },
-                              ),
-                            );
-                          },
+                          onTap: () {},
                           child: Container(
                             width: 151,
                             height: 46,
@@ -157,7 +162,7 @@ class _UserPageState extends State<UserPage> {
                             child: const Align(
                               alignment: Alignment.center,
                               child: Text(
-                                'Edit your profile',
+                                'Follow',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     color: Color.fromRGBO(0, 0, 0, 1),
@@ -183,7 +188,7 @@ class _UserPageState extends State<UserPage> {
                                   Row(
                                     children: [
                                       Text(
-                                        'Work at:',
+                                        'Work at :',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 0.5),
@@ -196,7 +201,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "${UserDetails.profession}",
+                                        "${widget.array[widget.index]['Info']['Profession']}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),
@@ -225,7 +230,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "${UserDetails.dob}",
+                                        "${widget.array[widget.index]['Info']['DOB']}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),
@@ -290,7 +295,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "${UserDetails.location}",
+                                        "${widget.array[widget.index]['Info']['Location']}",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),

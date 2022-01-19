@@ -65,7 +65,8 @@ class AuthenticationHelper {
             "TagLine": "Husband,Father,Hard Worker",
             "Profession": "AppUser",
             "Location": "California, USA",
-            "DOB": "01/01/2000"
+            "DOB": "01/01/2000",
+            "PhoneNumber": "0000000000",
           }
         }, SetOptions(merge: true))
         .then((value) => print("User Details Added"))
@@ -100,4 +101,5 @@ class AuthenticationHelper {
 
     return;
   }
+
 }

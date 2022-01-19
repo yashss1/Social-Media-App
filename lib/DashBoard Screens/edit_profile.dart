@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -182,7 +183,7 @@ class _EditProfileState extends State<EditProfile> {
                                         image: isPicked2
                                             ? FileImage(_pickedImage2)
                                                 as ImageProvider
-                                            : NetworkImage(
+                                            : CachedNetworkImageProvider(
                                                 "${UserDetails.bgPhotoUrl}"),
                                         fit: BoxFit.fitWidth),
                                   ),
@@ -202,7 +203,7 @@ class _EditProfileState extends State<EditProfile> {
                                                 image: isPicked
                                                     ? FileImage(_pickedImage)
                                                         as ImageProvider
-                                                    : NetworkImage(
+                                                    : CachedNetworkImageProvider(
                                                         "${UserDetails.profilePhotoUrl}"),
                                                 fit: BoxFit.fitWidth),
                                             borderRadius: BorderRadius.all(
