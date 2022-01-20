@@ -12,4 +12,6 @@ class UserDetails {
   static String? dob;
   static String? location;
   static String? phone;
+
+  static List<Map<String,Object>>? array;
 }

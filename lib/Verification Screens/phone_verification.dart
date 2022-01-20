@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/Verification%20Screens/phone_verification2.dart';
 import 'package:social_media/model/button1.dart';
 import '../constants.dart';
@@ -18,7 +20,25 @@ class PhoneVerify extends StatefulWidget {
 class _PhoneVerifyState extends State<PhoneVerify> {
   TextEditingController phone_number = TextEditingController();
   String dialCode = "+1";
-  bool showSpinner = false;
+  bool showSpinner = false, flag = true;
+
+  Future getData(String phone) async {
+    final QuerySnapshot result =
+        await FirebaseFirestore.instance.collection('Users').get();
+    final List<DocumentSnapshot> documents = result.docs;
+
+    // Iterate through all the Documents
+    documents.forEach((data) {
+      bool docStatus = data.exists;
+      if (docStatus == true) {
+        if (data['Info']['PhoneNumber'] == phone) {
+          setState(() {
+            flag = false;
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,12 +151,32 @@ class _PhoneVerifyState extends State<PhoneVerify> {
                           setState(() {
                             showSpinner = true;
                           });
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PhoneVerify2(
-                                        phone: "$dialCode${phone_number.text}",
-                                      )));
+                          flag = true;
+                          await getData("$dialCode${phone_number.text}")
+                              .then((value) {
+                            if (flag == true) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PhoneVerify2(
+                                            phone:
+                                                "$dialCode${phone_number.text}",
+                                          )));
+                            } else {
+                              setState(() {
+                                showSpinner = false;
+                              });
+                              print("PhoneNumber already present");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Phone Number Already Registered",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
+                            }
+                          });
                         }
                       },
                       child: Button1(
