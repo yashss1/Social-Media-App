@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/Services/user_details.dart';
+import 'package:social_media/constants.dart';
 import 'package:social_media/model/comment_model.dart';
 import 'package:social_media/model/story_model.dart';
 
@@ -10,6 +13,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  TextEditingController comment = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -60,11 +65,11 @@ class _HomeState extends State<Home> {
                       Container(
                           width: 34.14285659790039,
                           height: 32.590911865234375,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: Color.fromRGBO(196, 196, 196, 1),
                             image: DecorationImage(
-                                image:
-                                    AssetImage('assets/images/Ellipse13.png'),
+                                image: CachedNetworkImageProvider(
+                                    "${UserDetails.profilePhotoUrl}"),
                                 fit: BoxFit.fitWidth),
                             borderRadius: BorderRadius.all(Radius.elliptical(
                                 34.14285659790039, 32.590911865234375)),
@@ -133,27 +138,34 @@ class _HomeState extends State<Home> {
                                         bottom: 15),
                                     width: 52,
                                     height: 52,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       color: Color.fromRGBO(100, 94, 94, 1),
                                       image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/Ellipse13.png'),
+                                          image: CachedNetworkImageProvider(
+                                              "${UserDetails.profilePhotoUrl}"),
                                           fit: BoxFit.fitWidth),
                                       borderRadius: BorderRadius.all(
                                           Radius.elliptical(52, 52)),
                                     )),
-                                const Text(
-                                  'Something new in your mind',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(
-                                          0, 0, 0, 0.4699999988079071),
-                                      fontFamily: 'Lato',
-                                      fontSize: 16,
-                                      letterSpacing:
-                                          0 /*percentages not used in flutter. defaulting to zero*/,
-                                      fontWeight: FontWeight.normal,
-                                      height: 1),
+                                Container(
+                                  width: deviceWidth * .55,
+                                  child: TextField(
+                                    controller: comment,
+                                    textAlign: TextAlign.left,
+                                    maxLines: 2,
+                                    decoration: InputDecoration(
+                                      hintText: "Something in your mind",
+                                    ),
+                                    style: TextStyle(
+                                        color: Color.fromRGBO(
+                                            0, 0, 0, 0.4699999988079071),
+                                        fontFamily: 'Lato',
+                                        fontSize: 18,
+                                        letterSpacing:
+                                            0 /*percentages not used in flutter. defaulting to zero*/,
+                                        fontWeight: FontWeight.normal,
+                                        height: 1),
+                                  ),
                                 )
                               ],
                             ),

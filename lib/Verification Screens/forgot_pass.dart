@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -18,6 +19,25 @@ class _ForgotPassState extends State<ForgotPass> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool showSpinner = false;
+  bool flag = true;
+
+  Future<void> getData(String email) async {
+    final QuerySnapshot result =
+        await FirebaseFirestore.instance.collection('Users').get();
+    final List<DocumentSnapshot> documents = result.docs;
+
+    // Iterate through all the Documents
+    documents.forEach((data) {
+      bool docStatus = data.exists;
+      if (docStatus == true) {
+        if (data['Info']['Email'] == email) {
+          setState(() {
+            flag = false;
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,24 +125,40 @@ class _ForgotPassState extends State<ForgotPass> {
                           setState(() {
                             showSpinner = true;
                           });
-                          await FirebaseAuth.instance
-                              .sendPasswordResetEmail(email: email.text)
-                              .then(
+                          await getData(email.text).then((value) {
+                            if (flag == false) {
+                              FirebaseAuth.instance
+                                  .sendPasswordResetEmail(email: email.text)
+                                  .then(
                                 (result) {
-                                setState(() {
-                                  showSpinner = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Reset Link sent to ${email.text}",
-                                      style: TextStyle(fontSize: 16),
+                                  setState(() {
+                                    showSpinner = false;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Reset Link sent to ${email.text}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
+                                  );
+                                  Navigator.pop(context);
+                                },
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Email ${email.text} not Registered",
+                                    style: TextStyle(fontSize: 16),
                                   ),
-                                );
-                                Navigator.pop(context);
-                            },
-                          );
+                                ),
+                              );
+                              setState(() {
+                                showSpinner = false;
+                              });
+                            }
+                          });
                         }
                       },
                       child: Button1(
