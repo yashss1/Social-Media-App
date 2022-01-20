@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
 import 'package:social_media/Services/user_details.dart';
+import 'package:social_media/constants.dart';
 import 'package:social_media/model/friends_model.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -155,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               color: const Color.fromRGBO(255, 255, 255, 1),
                               border: Border.all(
-                                color: const Color.fromRGBO(0, 0, 0, 1),
+                                color: pink,
                                 width: 1,
                               ),
                             ),
@@ -165,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Follow',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                    color: Colors.pink,
                                     fontFamily: 'Lato',
                                     fontSize: 16,
                                     letterSpacing:
