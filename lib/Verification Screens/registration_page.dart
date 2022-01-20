@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/Services/authentication_helper.dart';
 import 'package:social_media/Services/store_user_info.dart';
+import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/button1.dart';
 
@@ -21,7 +22,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool showSpinner = false;
   bool flag = true;
 
-  Future<void> getData(String username) async {
+  var array = <Map>[];
+
+  Future getData(String username) async {
     final QuerySnapshot result =
         await FirebaseFirestore.instance.collection('Users').get();
     final List<DocumentSnapshot> documents = result.docs;
@@ -30,11 +33,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     documents.forEach((data) {
       bool docStatus = data.exists;
       if (docStatus == true) {
+        array.add(data['Info']);
         if (data['Info']['Username'] == username) {
           flag = false;
           print("Username already present ${flag}");
         }
       }
+      // print(array);
+      UserDetails.array = array.cast<Map<String, Object>>();
     });
   }
 
@@ -128,7 +134,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       showSpinner = true;
                     });
                     await getData(userName.text).then((value) {
-                      print(flag);
+                      // print(flag);
                       if (flag == true) {
                         AuthenticationHelper()
                             .signUp(email: email.text, password: password.text)

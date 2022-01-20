@@ -24,9 +24,9 @@ class _PhoneVerify2State extends State<PhoneVerify2> {
   String dialCode = "+1";
   bool showSpinner = false;
 
-  String smsCode = "";
+  String smsCode = "", code = "";
+  String _verificationCode = "753421";
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
-  String _verificationCode = "456789";
 
   @override
   void initState() {
@@ -39,41 +39,102 @@ class _PhoneVerify2State extends State<PhoneVerify2> {
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: widget.phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
+          code = credential.smsCode!;
           print('User Phone Added');
           UserDetails.phone = widget.phone;
           print(UserDetails.phone);
 
-          // await AuthenticationHelper().userPhone(phone_number.text).then(
-          //   (result) {
-          //     Navigator.pushReplacement(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => GetUserData(),
-          //       ),
-          //     );
-          //   },
-          // );
-          final CollectionReference userCollection =
-              FirebaseFirestore.instance.collection('Users');
-          FirebaseAuth auth = FirebaseAuth.instance;
-          String uid = auth.currentUser!.uid.toString();
+        //   // await AuthenticationHelper().userPhone(phone_number.text).then(
+        //   //   (result) {
+        //   //     Navigator.pushReplacement(
+        //   //       context,
+        //   //       MaterialPageRoute(
+        //   //         builder: (context) => GetUserData(),
+        //   //       ),
+        //   //     );
+        //   //   },
+        //   // );
+        //   final CollectionReference userCollection =
+        //       FirebaseFirestore.instance.collection('Users');
+        //   FirebaseAuth auth = FirebaseAuth.instance;
+        //   String uid = auth.currentUser!.uid.toString();
+        //
+        //   userCollection.doc(uid).set({
+        //     "Info": {
+        //       "PhoneNumber": widget.phone,
+        //     }
+        //   }, SetOptions(merge: true)).then(
+        //     (value) {
+        //       print("User Phone Number Added");
+        //       Navigator.pushAndRemoveUntil(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) => GetUserData(),
+        //           ),
+        //           (route) => false);
+        //     },
+        //   ).catchError(
+        //       (error) => print("Failed to Add user Phone Number: $error"));
 
-          userCollection.doc(uid).set({
-            "Info": {
-              "PhoneNumber": widget.phone,
-            }
-          }, SetOptions(merge: true)).then(
-            (value) {
-              print("User Phone Number Added");
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GetUserData(),
+          await FirebaseAuth.instance.currentUser!
+              .linkWithCredential(credential)
+              .then((value) {
+            setState(() {
+              showSpinner = true;
+            });
+            // print(code);
+            try {
+              UserDetails.phone = widget.phone;
+              final CollectionReference userCollection =
+              FirebaseFirestore.instance
+                  .collection('Users');
+              FirebaseAuth auth = FirebaseAuth.instance;
+              String uid = auth.currentUser!.uid.toString();
+
+              userCollection.doc(uid).set({
+                "Info": {
+                  "PhoneNumber": widget.phone,
+                }
+              }, SetOptions(merge: true)).then(
+                    (value) {
+                  setState(() {
+                    showSpinner = false;
+                  });
+                  print("User Phone Number Added");
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GetUserData(),
+                      ),
+                          (route) => false);
+                },
+              ).catchError((error) => print(
+                  "Failed to Add user Phone Number: $error"));
+            } catch (e) {
+              print(e);
+              setState(() {
+                showSpinner = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Invalid OTP",
+                    style: TextStyle(fontSize: 16),
                   ),
-                  (route) => false);
-            },
-          ).catchError(
-              (error) => print("Failed to Add user Phone Number: $error"));
+                ),
+              );
+            }
+          }).catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  error.toString(),
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            );
+          });
+
         },
         verificationFailed: (FirebaseAuthException e) {
           print(e.message);
@@ -197,50 +258,69 @@ class _PhoneVerify2State extends State<PhoneVerify2> {
                       SizedBox(height: deviceHeight * 0.025),
                       InkWell(
                         onTap: () async {
-                          setState(() {
-                            showSpinner = true;
-                          });
-                          print(smsCode);
-                          try {
-                            print('User Phone Added');
-                            UserDetails.phone = widget.phone;
-                            final CollectionReference userCollection =
-                                FirebaseFirestore.instance.collection('Users');
-                            FirebaseAuth auth = FirebaseAuth.instance;
-                            String uid = auth.currentUser!.uid.toString();
-
-                            userCollection.doc(uid).set({
-                              "Info": {
-                                "PhoneNumber": widget.phone,
-                              }
-                            }, SetOptions(merge: true)).then(
-                              (value) {
-                                setState(() {
-                                  showSpinner = false;
-                                });
-                                print("User Phone Number Added");
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => GetUserData(),
-                                    ),
-                                    (route) => false);
-                              },
-                            ).catchError((error) => print(
-                                "Failed to Add user Phone Number: $error"));
-                          } catch (e) {
+                          PhoneAuthCredential credential =
+                              PhoneAuthProvider.credential(
+                                  verificationId: _verificationCode,
+                                  smsCode: smsCode);
+                          await FirebaseAuth.instance.currentUser!
+                              .linkWithCredential(credential)
+                              .then((value) {
                             setState(() {
-                              showSpinner = false;
+                              showSpinner = true;
                             });
+                            print(smsCode);
+                            try {
+                              UserDetails.phone = widget.phone;
+                              final CollectionReference userCollection =
+                                  FirebaseFirestore.instance
+                                      .collection('Users');
+                              FirebaseAuth auth = FirebaseAuth.instance;
+                              String uid = auth.currentUser!.uid.toString();
+
+                              userCollection.doc(uid).set({
+                                "Info": {
+                                  "PhoneNumber": widget.phone,
+                                }
+                              }, SetOptions(merge: true)).then(
+                                (value) {
+                                  setState(() {
+                                    showSpinner = false;
+                                  });
+                                  print("User Phone Number Added");
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GetUserData(),
+                                      ),
+                                      (route) => false);
+                                },
+                              ).catchError((error) => print(
+                                  "Failed to Add user Phone Number: $error"));
+                            } catch (e) {
+                              print(e);
+                              setState(() {
+                                showSpinner = false;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Invalid OTP",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
+                            }
+                          }).catchError((error) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  "Invalid OTP",
+                                  error.toString(),
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ),
                             );
-                          }
+                          });
+
                         },
                         child: Button1(
                           name: 'Verify Phone Number',
