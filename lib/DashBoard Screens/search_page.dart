@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/OtherScreens/profile_page.dart';
+import 'package:social_media/Services/user_details.dart';
 
 import '../constants.dart';
 
@@ -17,6 +18,7 @@ class _SearchPageState extends State<SearchPage> {
   String searchField = "";
 
   bool resultData(List arr, int index, String _key) {
+    if (arr[index]['Info']['Uid'] == UserDetails.uid) return false;
     String email = arr[index]['Info']['Name'];
     String name = arr[index]['Info']['Username'];
     email = email.toLowerCase();
