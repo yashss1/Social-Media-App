@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_full_image_screen/custom_full_image_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
+import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/friends_model.dart';
 import 'edit_profile.dart';
@@ -16,6 +18,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   var followers, following, frndList = [];
+  bool noFollowing = false;
 
   Future getData() async {
     // Following Retrieval
@@ -25,10 +28,19 @@ class _UserPageState extends State<UserPage> {
         .get();
     bool docStatus = _doc.exists;
     if (docStatus == false) {
-    } else {
       setState(() {
-        following = _doc['Following'];
+        noFollowing = true;
       });
+    } else {
+      if (_doc['Following'].length == null || _doc['Following'].length == 0) {
+        setState(() {
+          noFollowing = true;
+        });
+      } else {
+        setState(() {
+          following = _doc['Following'];
+        });
+      }
     }
 
     // Followers Retrieval
@@ -58,9 +70,20 @@ class _UserPageState extends State<UserPage> {
             .doc(following[i]['UID'])
             .get();
 
-        Map<String, String> mp = {
-          'Name': curr_doc['Info']['Name'],
-          'Image': curr_doc['Info']['ProfilePhotoUrl'],
+        Map<String, dynamic> mp = {
+          "Info": {
+            'Name': curr_doc['Info']['Name'],
+            'Username': curr_doc['Info']['Username'],
+            'Email': curr_doc['Info']['Email'],
+            'Uid': curr_doc['Info']['Uid'],
+            'BgPhotoUrl': curr_doc['Info']['BgPhotoUrl'],
+            'ProfilePhotoUrl': curr_doc['Info']['ProfilePhotoUrl'],
+            'TagLine': curr_doc['Info']['TagLine'],
+            'Profession': curr_doc['Info']['Profession'],
+            'Location': curr_doc['Info']['Location'],
+            'DOB': curr_doc['Info']['DOB'],
+            'PhoneNumber': curr_doc['Info']['PhoneNumber'],
+          }
         };
         frndList.add(mp);
       }
@@ -122,42 +145,40 @@ class _UserPageState extends State<UserPage> {
                           width: deviceWidth,
                           child: Stack(
                             children: [
-                              Container(
-                                width: deviceWidth,
-                                height: deviceHeight * 0.25,
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(196, 196, 196, 1),
-                                  // image: DecorationImage(
-                                  //     image: AssetImage(
-                                  //         'assets/images/Rectangle10 (1).png'),
-                                  //     fit: BoxFit.fitWidth),
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          "${UserDetails.bgPhotoUrl}"),
-                                      fit: BoxFit.fitWidth),
+                              ImageCachedFullscreen(
+                                imageUrl: "${UserDetails.bgPhotoUrl}",
+                                imageWidth: deviceWidth,
+                                imageHeight: deviceHeight * 0.25,
+                                imageFit: BoxFit.fitWidth,
+                                imageDetailsHeight: 450,
+                                imageDetailsWidth: 400,
+                                withHeroAnimation: true,
+                                placeholder: Container(
+                                  child: Icon(Icons.check),
                                 ),
+                                errorWidget: Container(
+                                  child: Icon(Icons.error),
+                                ),
+                                placeholderDetails: Container(),
                               ),
                               Align(
                                 alignment: Alignment.bottomCenter,
-                                child: Container(
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        width: 125,
-                                        height: 122,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              Color.fromRGBO(196, 196, 196, 1),
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${UserDetails.profilePhotoUrl}"),
-                                              fit: BoxFit.fitWidth),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.elliptical(125, 122)),
-                                        ),
-                                      ),
-                                    ],
+                                child: ImageCachedFullscreen(
+                                  imageUrl: "${UserDetails.profilePhotoUrl}",
+                                  imageWidth: 125,
+                                  imageHeight: 122,
+                                  imageBorderRadius: 125,
+                                  imageFit: BoxFit.fitWidth,
+                                  imageDetailsHeight: 450,
+                                  imageDetailsWidth: 450,
+                                  withHeroAnimation: true,
+                                  placeholder: Container(
+                                    child: Icon(Icons.check),
                                   ),
+                                  errorWidget: Container(
+                                    child: Icon(Icons.error),
+                                  ),
+                                  placeholderDetails: Container(),
                                 ),
                               ),
                             ],
@@ -385,7 +406,7 @@ class _UserPageState extends State<UserPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: const [
                                   Text(
-                                    'Friends',
+                                    'Following',
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         color: Color.fromRGBO(0, 0, 0, 1),
@@ -414,8 +435,8 @@ class _UserPageState extends State<UserPage> {
                               SizedBox(height: 20),
                               Text(
                                 following == null
-                                    ? "0"
-                                    : '${following.length} Friends',
+                                    ? "0 Following"
+                                    : '${following.length} Following',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     color: Color.fromRGBO(
@@ -435,20 +456,23 @@ class _UserPageState extends State<UserPage> {
                                     width: deviceWidth - 32,
                                     child: (frndList == null ||
                                             frndList.length == 0)
-                                        ? Center(
-                                            child: SizedBox(
-                                              width: 30,
-                                              height: 30,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 3.0,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                        Color>(
-                                                  Colors.pink,
+                                        ? noFollowing == true
+                                            ? Container()
+                                            : Center(
+                                                child: SizedBox(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 3.0,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      Colors.pink,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          )
+                                              )
                                         : ListView.builder(
                                             physics: BouncingScrollPhysics(),
                                             scrollDirection: Axis.horizontal,
@@ -458,10 +482,23 @@ class _UserPageState extends State<UserPage> {
                                                     ? frndList.length
                                                     : 10,
                                             itemBuilder: (context, index) {
-                                              return FriendModel(
-                                                  name: frndList[index]['Name'],
-                                                  img: frndList[index]
-                                                      ['Image']);
+                                              return InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ProfilePage(
+                                                                array: frndList,
+                                                                index: index,
+                                                              )));
+                                                },
+                                                child: FriendModel(
+                                                    name: frndList[index]
+                                                        ['Info']['Name'],
+                                                    img: frndList[index]['Info']
+                                                        ['ProfilePhotoUrl']),
+                                              );
                                             }),
                                   ),
                                 ],

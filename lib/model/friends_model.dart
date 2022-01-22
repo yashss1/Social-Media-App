@@ -28,17 +28,22 @@ class FriendModel extends StatelessWidget {
                     image: CachedNetworkImageProvider(img),
                     fit: BoxFit.fitWidth),
               )),
-          Text(
-            name,
-            textAlign: TextAlign.left,
-            style: const TextStyle(
-                color: Color.fromRGBO(0, 0, 0, 1.0),
-                fontFamily: 'Lato',
-                fontSize: 18,
-                letterSpacing:
-                    0 /*percentages not used in flutter. defaulting to zero*/,
-                fontWeight: FontWeight.normal,
-                height: 1),
+          SizedBox(height: 5),
+          Container(
+            width: 90,
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: Color.fromRGBO(0, 0, 0, 1.0),
+                  overflow: TextOverflow.ellipsis,
+                  fontFamily: 'Lato',
+                  fontSize: 18,
+                  letterSpacing:
+                      0 /*percentages not used in flutter. defaulting to zero*/,
+                  fontWeight: FontWeight.normal,
+                  height: 1),
+            ),
           ),
         ],
       ),

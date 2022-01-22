@@ -155,6 +155,9 @@ class _PhoneVerifyState extends State<PhoneVerify> {
                           await getData("$dialCode${phone_number.text}")
                               .then((value) {
                             if (flag == true) {
+                              setState(() {
+                                showSpinner = false;
+                              });
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

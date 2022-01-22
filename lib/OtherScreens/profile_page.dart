@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_full_image_screen/custom_full_image_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -18,7 +19,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool showSpinner = false;
+  bool showSpinner = true;
   String followStatus = "Follow";
   var arrayFriend, arr;
 
@@ -256,12 +257,83 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  var followers, following, frndList = [];
+  bool noFollowing = false;
+
+  Future getData() async {
+    // Following Retrieval
+    var _doc = await FirebaseFirestore.instance
+        .collection("Following")
+        .doc(widget.array[widget.index]['Info']['Uid'])
+        .get();
+    bool docStatus = _doc.exists;
+    if (docStatus == false) {
+      setState(() {
+        noFollowing = true;
+      });
+    } else {
+      if(_doc['Following'].length == 0){
+        setState(() {
+          noFollowing = true;
+        });
+      }else{
+        setState(() {
+          following = _doc['Following'];
+        });
+      }
+    }
+
+    // Followers Retrieval
+    var _doc1 = await FirebaseFirestore.instance
+        .collection("Followers")
+        .doc(widget.array[widget.index]['Info']['Uid'])
+        .get();
+    bool docStatus1 = _doc1.exists;
+    if (docStatus1 == false) {
+    } else {
+      setState(() {
+        followers = _doc1['Followers'];
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     // Checking whether this UID is already my friend
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      checkFriend();
+      checkFriend().then((value) async {
+        setState(() {
+          showSpinner = false;
+        });
+        await getData().then((value) async {
+          for (int i = 0; i < following.length; i++) {
+            var curr_doc = await FirebaseFirestore.instance
+                .collection("Users")
+                .doc(following[i]['UID'])
+                .get();
+
+            Map<String, dynamic> mp = {
+              "Info": {
+                'Name': curr_doc['Info']['Name'],
+                'Username': curr_doc['Info']['Username'],
+                'Email': curr_doc['Info']['Email'],
+                'Uid': curr_doc['Info']['Uid'],
+                'BgPhotoUrl': curr_doc['Info']['BgPhotoUrl'],
+                'ProfilePhotoUrl': curr_doc['Info']['ProfilePhotoUrl'],
+                'TagLine': curr_doc['Info']['TagLine'],
+                'Profession': curr_doc['Info']['Profession'],
+                'Location': curr_doc['Info']['Location'],
+                'DOB': curr_doc['Info']['DOB'],
+                'PhoneNumber': curr_doc['Info']['PhoneNumber'],
+              }
+            };
+            frndList.add(mp);
+          }
+          // print(frndList);
+          setState(() {});
+        });
+      });
     });
   }
 
@@ -288,42 +360,42 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: deviceWidth,
                           child: Stack(
                             children: [
-                              Container(
-                                width: deviceWidth,
-                                height: deviceHeight * 0.25,
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(196, 196, 196, 1),
-                                  // image: DecorationImage(
-                                  //     image: AssetImage(
-                                  //         'assets/images/Rectangle10 (1).png'),
-                                  //     fit: BoxFit.fitWidth),
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          "${widget.array[widget.index]['Info']['BgPhotoUrl']}"),
-                                      fit: BoxFit.fitWidth),
+                              ImageCachedFullscreen(
+                                imageUrl:
+                                    "${widget.array[widget.index]['Info']['BgPhotoUrl']}",
+                                imageWidth: deviceWidth,
+                                imageHeight: deviceHeight * 0.25,
+                                imageFit: BoxFit.fitWidth,
+                                imageDetailsHeight: 450,
+                                imageDetailsWidth: 400,
+                                withHeroAnimation: true,
+                                placeholder: Container(
+                                  child: Icon(Icons.check),
                                 ),
+                                errorWidget: Container(
+                                  child: Icon(Icons.error),
+                                ),
+                                placeholderDetails: Container(),
                               ),
                               Align(
                                 alignment: Alignment.bottomCenter,
-                                child: Container(
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        width: 125,
-                                        height: 122,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              Color.fromRGBO(196, 196, 196, 1),
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${widget.array[widget.index]['Info']['ProfilePhotoUrl']}"),
-                                              fit: BoxFit.fitWidth),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.elliptical(125, 122)),
-                                        ),
-                                      ),
-                                    ],
+                                child: ImageCachedFullscreen(
+                                  imageUrl:
+                                      "${widget.array[widget.index]['Info']['ProfilePhotoUrl']}",
+                                  imageWidth: 125,
+                                  imageHeight: 122,
+                                  imageBorderRadius: 125,
+                                  imageFit: BoxFit.fitWidth,
+                                  imageDetailsHeight: 450,
+                                  imageDetailsWidth: 450,
+                                  withHeroAnimation: true,
+                                  placeholder: Container(
+                                    child: Icon(Icons.check),
                                   ),
+                                  errorWidget: Container(
+                                    child: Icon(Icons.error),
+                                  ),
+                                  placeholderDetails: Container(),
                                 ),
                               ),
                               Positioned(
@@ -561,7 +633,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: const [
                                   Text(
-                                    'Friends',
+                                    'Following',
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         color: Color.fromRGBO(0, 0, 0, 1),
@@ -588,8 +660,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                               SizedBox(height: 20),
-                              const Text(
-                                '854 friends',
+                              Text(
+                                following == null
+                                    ? "0 Following"
+                                    : '${following.length} Following',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     color: Color.fromRGBO(
@@ -602,29 +676,59 @@ class _ProfilePageState extends State<ProfilePage> {
                                     height: 1),
                               ),
                               SizedBox(height: 30),
-                              SingleChildScrollView(
-                                physics: BouncingScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: const [
-                                    FriendModel(
-                                        name: 'Alex John',
-                                        img: 'assets/images/Rectangle12.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Martin',
-                                        img: 'assets/images/Rectangle13.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Shreya Roy',
-                                        img: 'assets/images/Rectangle14.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Mila John',
-                                        img: 'assets/images/Rectangle15.png'),
-                                    SizedBox(width: 20),
-                                  ],
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 120,
+                                    width: deviceWidth - 32,
+                                    child: (frndList == null ||
+                                            frndList.length == 0)
+                                        ? noFollowing == true
+                                            ? Container()
+                                            : Center(
+                                                child: SizedBox(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 3.0,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      Colors.pink,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                        : ListView.builder(
+                                            physics: BouncingScrollPhysics(),
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: frndList == null
+                                                ? 0
+                                                : frndList.length <= 10
+                                                    ? frndList.length
+                                                    : 10,
+                                            itemBuilder: (context, index) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  // Navigator.push(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (context) =>
+                                                  //             ProfilePage(
+                                                  //               array: frndList,
+                                                  //               index: index,
+                                                  //             )));
+                                                },
+                                                child: FriendModel(
+                                                    name: frndList[index]
+                                                        ['Info']['Name'],
+                                                    img: frndList[index]['Info']
+                                                        ['ProfilePhotoUrl']),
+                                              );
+                                            }),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
