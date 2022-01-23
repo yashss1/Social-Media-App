@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_full_image_screen/custom_full_image_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
+import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/friends_model.dart';
 import 'edit_profile.dart';
@@ -14,6 +17,81 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+  var followers, following, frndList = [];
+  bool noFollowing = false;
+
+  Future getData() async {
+    // Following Retrieval
+    var _doc = await FirebaseFirestore.instance
+        .collection("Following")
+        .doc(UserDetails.uid)
+        .get();
+    bool docStatus = _doc.exists;
+    if (docStatus == false) {
+      setState(() {
+        noFollowing = true;
+      });
+    } else {
+      if (_doc['Following'].length == null || _doc['Following'].length == 0) {
+        setState(() {
+          noFollowing = true;
+        });
+      } else {
+        setState(() {
+          following = _doc['Following'];
+        });
+      }
+    }
+
+    // Followers Retrieval
+    var _doc1 = await FirebaseFirestore.instance
+        .collection("Followers")
+        .doc(UserDetails.uid)
+        .get();
+    bool docStatus1 = _doc1.exists;
+    if (docStatus1 == false) {
+    } else {
+      setState(() {
+        followers = _doc1['Followers'];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   getData();
+    // });
+    getData().then((value) async {
+      for (int i = 0; i < following.length; i++) {
+        var curr_doc = await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(following[i]['UID'])
+            .get();
+
+        Map<String, dynamic> mp = {
+          "Info": {
+            'Name': curr_doc['Info']['Name'],
+            'Username': curr_doc['Info']['Username'],
+            'Email': curr_doc['Info']['Email'],
+            'Uid': curr_doc['Info']['Uid'],
+            'BgPhotoUrl': curr_doc['Info']['BgPhotoUrl'],
+            'ProfilePhotoUrl': curr_doc['Info']['ProfilePhotoUrl'],
+            'TagLine': curr_doc['Info']['TagLine'],
+            'Profession': curr_doc['Info']['Profession'],
+            'Location': curr_doc['Info']['Location'],
+            'DOB': curr_doc['Info']['DOB'],
+            'PhoneNumber': curr_doc['Info']['PhoneNumber'],
+          }
+        };
+        frndList.add(mp);
+      }
+      // print(frndList);
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -33,17 +111,24 @@ class _UserPageState extends State<UserPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Signature',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          color: Color.fromRGBO(255, 79, 90, 1),
-                          fontFamily: 'Lato',
-                          fontSize: 20,
-                          letterSpacing:
-                              0 /*percentages not used in flutter. defaulting to zero*/,
-                          fontWeight: FontWeight.normal,
-                          height: 1),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          print(following.length);
+                        });
+                      },
+                      child: Text(
+                        'Signature',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            color: Color.fromRGBO(255, 79, 90, 1),
+                            fontFamily: 'Lato',
+                            fontSize: 20,
+                            letterSpacing:
+                                0 /*percentages not used in flutter. defaulting to zero*/,
+                            fontWeight: FontWeight.normal,
+                            height: 1),
+                      ),
                     ),
                   ],
                 ),
@@ -51,6 +136,7 @@ class _UserPageState extends State<UserPage> {
               Expanded(
                 child: Container(
                   child: SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
                     child: Column(
                       children: [
                         Container(
@@ -59,42 +145,40 @@ class _UserPageState extends State<UserPage> {
                           width: deviceWidth,
                           child: Stack(
                             children: [
-                              Container(
-                                width: deviceWidth,
-                                height: deviceHeight * 0.25,
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(196, 196, 196, 1),
-                                  // image: DecorationImage(
-                                  //     image: AssetImage(
-                                  //         'assets/images/Rectangle10 (1).png'),
-                                  //     fit: BoxFit.fitWidth),
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          "${UserDetails.bgPhotoUrl}"),
-                                      fit: BoxFit.fill),
+                              ImageCachedFullscreen(
+                                imageUrl: "${UserDetails.bgPhotoUrl}",
+                                imageWidth: deviceWidth,
+                                imageHeight: deviceHeight * 0.25,
+                                imageFit: BoxFit.fitWidth,
+                                imageDetailsHeight: 450,
+                                imageDetailsWidth: 400,
+                                withHeroAnimation: true,
+                                placeholder: Container(
+                                  child: Icon(Icons.check),
                                 ),
+                                errorWidget: Container(
+                                  child: Icon(Icons.error),
+                                ),
+                                placeholderDetails: Container(),
                               ),
                               Align(
                                 alignment: Alignment.bottomCenter,
-                                child: Container(
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        width: 125,
-                                        height: 122,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              Color.fromRGBO(196, 196, 196, 1),
-                                          image: DecorationImage(
-                                              image: CachedNetworkImageProvider(
-                                                  "${UserDetails.profilePhotoUrl}"),
-                                              fit: BoxFit.fitWidth),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.elliptical(125, 122)),
-                                        ),
-                                      ),
-                                    ],
+                                child: ImageCachedFullscreen(
+                                  imageUrl: "${UserDetails.profilePhotoUrl}",
+                                  imageWidth: 125,
+                                  imageHeight: 122,
+                                  imageBorderRadius: 125,
+                                  imageFit: BoxFit.fitWidth,
+                                  imageDetailsHeight: 450,
+                                  imageDetailsWidth: 450,
+                                  withHeroAnimation: true,
+                                  placeholder: Container(
+                                    child: Icon(Icons.check),
                                   ),
+                                  errorWidget: Container(
+                                    child: Icon(Icons.error),
+                                  ),
+                                  placeholderDetails: Container(),
                                 ),
                               ),
                             ],
@@ -246,7 +330,7 @@ class _UserPageState extends State<UserPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Followed By :',
                                         textAlign: TextAlign.left,
@@ -261,7 +345,9 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        '0 People',
+                                        followers == null
+                                            ? "0 People"
+                                            : '${followers.length} People',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),
@@ -320,7 +406,7 @@ class _UserPageState extends State<UserPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: const [
                                   Text(
-                                    'Friends',
+                                    'Following',
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         color: Color.fromRGBO(0, 0, 0, 1),
@@ -347,8 +433,10 @@ class _UserPageState extends State<UserPage> {
                                 ],
                               ),
                               SizedBox(height: 20),
-                              const Text(
-                                '854 friends',
+                              Text(
+                                following == null
+                                    ? "0 Following"
+                                    : '${following.length} Following',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     color: Color.fromRGBO(
@@ -361,33 +449,64 @@ class _UserPageState extends State<UserPage> {
                                     height: 1),
                               ),
                               SizedBox(height: 30),
-                              SingleChildScrollView(
-                                physics: BouncingScrollPhysics(),
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: const [
-                                    FriendModel(
-                                        name: 'Alex John',
-                                        img: 'assets/images/Rectangle12.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Martin',
-                                        img: 'assets/images/Rectangle13.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Shreya Roy',
-                                        img: 'assets/images/Rectangle14.png'),
-                                    SizedBox(width: 20),
-                                    FriendModel(
-                                        name: 'Mila John',
-                                        img: 'assets/images/Rectangle15.png'),
-                                    SizedBox(width: 20),
-                                  ],
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 120,
+                                    width: deviceWidth - 32,
+                                    child: (frndList == null ||
+                                            frndList.length == 0)
+                                        ? noFollowing == true
+                                            ? Container()
+                                            : Center(
+                                                child: SizedBox(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 3.0,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      Colors.pink,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                        : ListView.builder(
+                                            physics: BouncingScrollPhysics(),
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: frndList == null
+                                                ? 0
+                                                : frndList.length <= 10
+                                                    ? frndList.length
+                                                    : 10,
+                                            itemBuilder: (context, index) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ProfilePage(
+                                                                array: frndList,
+                                                                index: index,
+                                                              )));
+                                                },
+                                                child: FriendModel(
+                                                    name: frndList[index]
+                                                        ['Info']['Name'],
+                                                    img: frndList[index]['Info']
+                                                        ['ProfilePhotoUrl']),
+                                              );
+                                            }),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
+                        SizedBox(height: 80),
                       ],
                     ),
                   ),
