@@ -39,6 +39,8 @@ class _UserPageState extends State<UserPage> {
       } else {
         setState(() {
           following = _doc['Following'];
+          print(UserDetails.uid);
+          print(following);
         });
       }
     }

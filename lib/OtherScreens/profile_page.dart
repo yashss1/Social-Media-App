@@ -245,14 +245,14 @@ class _ProfilePageState extends State<ProfilePage> {
       } else {
         arrayFriend += arr;
       }
-    }
-    // print(arrayFriend);
-    for (var i = 0; i < arrayFriend.length; i++) {
-      if (arrayFriend[i]['UID'] == widget.array[widget.index]['Info']['Uid']) {
-        // print("Got it");
-        setState(() {
-          followStatus = "Following";
-        });
+      // print(arrayFriend);
+      for (var i = 0; i < arrayFriend.length; i++) {
+        if (arrayFriend[i]['UID'] == widget.array[widget.index]['Info']['Uid']) {
+          // print("Got it");
+          setState(() {
+            followStatus = "Following";
+          });
+        }
       }
     }
   }

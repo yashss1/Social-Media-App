@@ -23,6 +23,7 @@ dependencies:
   country_code_picker: ^2.0.2
   pin_code_fields: ^7.3.0
   custom_full_image_screen: ^0.0.4
+  fluttertoast: ^8.0.8
 
 
 
