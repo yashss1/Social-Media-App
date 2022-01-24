@@ -3,17 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
+import 'package:social_media/model/friends_model.dart';
 
 import '../constants.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+class AllFollowing extends StatefulWidget {
+  const AllFollowing({Key? key, this.array}) : super(key: key);
+
+  final array;
 
   @override
-  _SearchPageState createState() => _SearchPageState();
+  _AllFollowingState createState() => _AllFollowingState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _AllFollowingState extends State<AllFollowing> {
   TextEditingController search = TextEditingController();
   String searchField = "";
 
@@ -32,13 +35,62 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: Container(
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
           height: deviceHeight,
           width: deviceWidth,
           child: Column(
             children: [
-              SizedBox(height: 30),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                width: deviceWidth,
+                height: 70,
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 16,
+                          child: InkWell(
+                            splashColor: Colors.pink,
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(
+                              Icons.arrow_back,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              child: Text(
+                                'Following',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color.fromRGBO(255, 79, 90, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 20,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 16),
                 width: deviceWidth,
@@ -106,70 +158,67 @@ class _SearchPageState extends State<SearchPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               Expanded(
-                child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('Users')
-                        .snapshots(),
-                    builder: (ctx, AsyncSnapshot snaps) {
-                      if (snaps.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      final _snap = snaps.data!.docs;
-                      return _snap.length == 0
-                          ? Container(
-                              color: Colors.pink,
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.only(
-                                top: MediaQuery.of(context).size.height * .3,
+                child: Container(
+                  width: deviceWidth - 32,
+                  child: (widget.array == null || widget.array.length == 0)
+                      ? Center(
+                          child: SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3.0,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.pink,
                               ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "WE'RE SORRY",
-                                  ),
-                                  Center(
-                                    child: Text(
-                                      "There is Nothing here...",
-                                      textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          itemCount:
+                              widget.array == null ? 0 : widget.array.length,
+                          itemBuilder: (context, index) {
+                            return (resultData(
+                                        widget.array, index, searchField)) ==
+                                    false
+                                ? SizedBox(height: 0)
+                                : InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ProfilePage(
+                                                    array: widget.array,
+                                                    index: index,
+                                                  )));
+                                    },
+                                    child: item(
+                                      image: widget.array[index]['Info']
+                                          ['ProfilePhotoUrl'],
+                                      name: widget.array[index]['Info']['Name'],
+                                      username: widget.array[index]['Info']
+                                          ['Username'],
+                                      ontap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfilePage(
+                                                      array: widget.array,
+                                                      index: index,
+                                                    )));
+                                      },
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.builder(
-                              physics: BouncingScrollPhysics(),
-                              itemCount: _snap.length,
-                              itemBuilder: (context, index) {
-                                return (resultData(
-                                            _snap, index, searchField)) ==
-                                        false
-                                    ? SizedBox(height: 0)
-                                    : item(
-                                        image: _snap[index]['Info']
-                                            ['ProfilePhotoUrl'],
-                                        name: _snap[index]['Info']['Name'],
-                                        username: _snap[index]['Info']
-                                            ['Username'],
-                                        ontap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProfilePage(
-                                                        array: _snap,
-                                                        index: index,
-                                                      )));
-                                        },
-                                      );
-                              });
-                    }),
+                                  );
+                          }),
+                ),
               ),
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

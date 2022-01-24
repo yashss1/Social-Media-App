@@ -92,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // Adding my UID in this UID's Follower Collection
     var _doc1 = await FirebaseFirestore.instance
         .collection("Followers")
-        .doc(UserDetails.uid)
+        .doc(widget.array[widget.index]['Info']['Uid'])
         .get();
     bool docStatus1 = _doc1.exists;
 
@@ -245,14 +245,15 @@ class _ProfilePageState extends State<ProfilePage> {
       } else {
         arrayFriend += arr;
       }
-    }
-    // print(arrayFriend);
-    for (var i = 0; i < arrayFriend.length; i++) {
-      if (arrayFriend[i]['UID'] == widget.array[widget.index]['Info']['Uid']) {
-        // print("Got it");
-        setState(() {
-          followStatus = "Following";
-        });
+      // print(arrayFriend);
+      for (var i = 0; i < arrayFriend.length; i++) {
+        if (arrayFriend[i]['UID'] ==
+            widget.array[widget.index]['Info']['Uid']) {
+          // print("Got it");
+          setState(() {
+            followStatus = "Following";
+          });
+        }
       }
     }
   }
@@ -272,11 +273,11 @@ class _ProfilePageState extends State<ProfilePage> {
         noFollowing = true;
       });
     } else {
-      if(_doc['Following'].length == 0){
+      if (_doc['Following'].length == 0) {
         setState(() {
           noFollowing = true;
         });
-      }else{
+      } else {
         setState(() {
           following = _doc['Following'];
         });
