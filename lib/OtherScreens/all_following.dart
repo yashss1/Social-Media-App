@@ -71,7 +71,7 @@ class _AllFollowingState extends State<AllFollowing> {
                           children: [
                             InkWell(
                               child: Text(
-                                'Following',
+                                '${widget.array.length} Following',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     color: Color.fromRGBO(255, 79, 90, 1),
