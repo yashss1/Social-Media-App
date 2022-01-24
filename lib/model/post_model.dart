@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media/OtherScreens/individual_post.dart';
+import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 
@@ -148,6 +149,35 @@ class _PostModelState extends State<PostModel> {
     setState(() {
       showSpinner = true;
     });
+    Navigator.pop(context);
+
+    //Deleting Likes Collection
+    final instance = FirebaseFirestore.instance;
+    final batch = instance.batch();
+    var collection = instance
+        .collection('Posts')
+        .doc(widget.array[widget.index]['postId'])
+        .collection("Likes");
+    var snapshots = await collection.get();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+
+    //Deleting Likes Collection
+    final instance2 = FirebaseFirestore.instance;
+    final batch2 = instance2.batch();
+    var collection2 = instance2
+        .collection('Posts')
+        .doc(widget.array[widget.index]['postId'])
+        .collection("Comments");
+    var snapshots2 = await collection2.get();
+    for (var doc in snapshots2.docs) {
+      batch2.delete(doc.reference);
+    }
+    await batch2.commit();
+
+    // Deleting the Post Document
     await FirebaseFirestore.instance
         .collection("Posts")
         .doc(widget.array[widget.index]['postId'])
@@ -160,7 +190,79 @@ class _PostModelState extends State<PostModel> {
   void handleClick(int item) async {
     switch (item) {
       case 0:
-        await deletePost();
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0)),
+              elevation: 5,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                width: MediaQuery.of(context).size.width * .7,
+                height: 160,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Confirmation",
+                          style: TextStyle(
+                              color: pink,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Are you Sure you want to delete this Post ?",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          InkWell(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () async {
+                              await deletePost();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
         break;
     }
   }
@@ -180,16 +282,42 @@ class _PostModelState extends State<PostModel> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(100, 94, 94, 1),
-                      image: DecorationImage(
-                          image: CachedNetworkImageProvider(
-                              '${widget.array[widget.index]['ProfilePhotoUrl']}'),
-                          fit: BoxFit.fitWidth),
-                      borderRadius: BorderRadius.all(Radius.elliptical(36, 36)),
+                  InkWell(
+                    onTap: () async {
+                      List array = [];
+                      var _doc1 = await FirebaseFirestore.instance
+                          .collection("Users")
+                          .doc(widget.array[widget.index]['AddedBy'])
+                          .get();
+                      bool docStatus1 = _doc1.exists;
+                      if (docStatus1 == true) {
+                        array.add(_doc1);
+                        if (array[0]['Info']['Uid'] == UserDetails.uid) {
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePage(
+                                array: array,
+                                index: 0,
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(100, 94, 94, 1),
+                        image: DecorationImage(
+                            image: CachedNetworkImageProvider(
+                                '${widget.array[widget.index]['ProfilePhotoUrl']}'),
+                            fit: BoxFit.fitWidth),
+                        borderRadius:
+                            BorderRadius.all(Radius.elliptical(36, 36)),
+                      ),
                     ),
                   ),
                 ],
@@ -274,7 +402,11 @@ class _PostModelState extends State<PostModel> {
                           children: [
                             InkWell(
                               onTap: () async {
-                                likePost(1);
+                                if (liked_button == 1) {
+                                  likePost(0);
+                                } else {
+                                  likePost(1);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -304,7 +436,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(2);
+                                if (liked_button == 2) {
+                                  likePost(0);
+                                } else {
+                                  likePost(2);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -334,7 +470,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(3);
+                                if (liked_button == 3) {
+                                  likePost(0);
+                                } else {
+                                  likePost(3);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -364,7 +504,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(4);
+                                if (liked_button == 4) {
+                                  likePost(0);
+                                } else {
+                                  likePost(4);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -394,7 +538,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(5);
+                                if (liked_button == 5) {
+                                  likePost(0);
+                                } else {
+                                  likePost(5);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -424,7 +572,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(6);
+                                if (liked_button == 6) {
+                                  likePost(0);
+                                } else {
+                                  likePost(6);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -454,7 +606,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(7);
+                                if (liked_button == 7) {
+                                  likePost(0);
+                                } else {
+                                  likePost(7);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -518,7 +674,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(9);
+                                if (liked_button == 9) {
+                                  likePost(0);
+                                } else {
+                                  likePost(9);
+                                }
                               },
                               child: Column(
                                 children: [
@@ -548,7 +708,11 @@ class _PostModelState extends State<PostModel> {
                             ),
                             InkWell(
                               onTap: () async {
-                                likePost(10);
+                                if (liked_button == 10) {
+                                  likePost(0);
+                                } else {
+                                  likePost(10);
+                                }
                               },
                               child: Column(
                                 children: [

@@ -671,30 +671,16 @@ class _IndividualPostState extends State<IndividualPost> {
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 20, right: 50, top: 15, bottom: 15),
-                                  width: 52,
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromRGBO(100, 94, 94, 1),
-                                    image: DecorationImage(
-                                        image: CachedNetworkImageProvider(
-                                            "${UserDetails.profilePhotoUrl}"),
-                                        fit: BoxFit.fitWidth),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.elliptical(52, 52)),
-                                  )),
-                              Container(
-                                width: deviceWidth * .55,
+                                width: deviceWidth * .7,
                                 child: TextField(
                                   controller: comment,
                                   textAlign: TextAlign.left,
                                   maxLines: 3,
                                   decoration: InputDecoration(
-                                    hintText: "Add a Comment",
+                                    hintText: "Type your comment...",
                                   ),
                                   style: TextStyle(
                                       color: Color.fromRGBO(

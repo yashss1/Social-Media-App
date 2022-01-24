@@ -20,6 +20,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool showSpinner = true;
+  bool noFollowers = false;
   String followStatus = "Follow";
   var arrayFriend, arr;
 
@@ -45,10 +46,11 @@ class _ProfilePageState extends State<ProfilePage> {
             'UID': widget.array[widget.index]['Info']['Uid'],
           }
         ])
-      }).then((value) {
+      }).then((value) async {
         setState(() {
           showSpinner = false;
         });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -106,7 +108,23 @@ class _ProfilePageState extends State<ProfilePage> {
             'UID': UserDetails.uid,
           }
         ])
-      }).then((value) {
+      }).then((value) async {
+        // Followers Retrieval
+        var _doc1 = await FirebaseFirestore.instance
+            .collection("Followers")
+            .doc(widget.array[widget.index]['Info']['Uid'])
+            .get();
+        bool docStatus1 = _doc1.exists;
+        if (docStatus1 == false) {
+          setState(() {
+            noFollowers = true;
+          });
+        } else {
+          setState(() {
+            followers = _doc1['Followers'];
+            print(followers);
+          });
+        }
         setState(() {
           showSpinner = false;
         });
@@ -121,7 +139,23 @@ class _ProfilePageState extends State<ProfilePage> {
             'UID': UserDetails.uid,
           }
         ])
-      }).then((value) {
+      }).then((value) async {
+        // Followers Retrieval
+        var _doc1 = await FirebaseFirestore.instance
+            .collection("Followers")
+            .doc(widget.array[widget.index]['Info']['Uid'])
+            .get();
+        bool docStatus1 = _doc1.exists;
+        if (docStatus1 == false) {
+          setState(() {
+            noFollowers = true;
+          });
+        } else {
+          setState(() {
+            followers = _doc1['Followers'];
+            print(followers);
+          });
+        }
         setState(() {
           showSpinner = false;
         });
@@ -220,7 +254,23 @@ class _ProfilePageState extends State<ProfilePage> {
         .doc(widget.array[widget.index]['Info']['Uid'])
         .set({
       'Followers': arrayNew2,
-    }).then((value) {
+    }).then((value)async {
+      // Followers Retrieval
+      var _doc1 = await FirebaseFirestore.instance
+          .collection("Followers")
+          .doc(widget.array[widget.index]['Info']['Uid'])
+          .get();
+      bool docStatus1 = _doc1.exists;
+      if (docStatus1 == false) {
+        setState(() {
+          noFollowers = true;
+        });
+      } else {
+        setState(() {
+          followers = _doc1['Followers'];
+          print(followers);
+        });
+      }
       setState(() {
         showSpinner = false;
       });
@@ -291,9 +341,13 @@ class _ProfilePageState extends State<ProfilePage> {
         .get();
     bool docStatus1 = _doc1.exists;
     if (docStatus1 == false) {
+      setState(() {
+        noFollowers = true;
+      });
     } else {
       setState(() {
         followers = _doc1['Followers'];
+        print(followers);
       });
     }
   }
@@ -560,7 +614,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Followed By :',
                                         textAlign: TextAlign.left,
@@ -575,7 +629,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        '0 People',
+                                        followers == null
+                                            ? "0 People"
+                                            : '${followers.length} People',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color.fromRGBO(0, 0, 0, 1),

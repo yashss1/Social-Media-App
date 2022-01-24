@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -387,17 +388,37 @@ class _EditProfileState extends State<EditProfile> {
                                   ),
                                 ),
                                 SizedBox(height: deviceHeight * 0.02),
-                                Text(
-                                  'Location',
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
-                                      fontFamily: 'Lato',
-                                      fontSize: 18,
-                                      letterSpacing:
-                                          0 /*percentages not used in flutter. defaulting to zero*/,
-                                      fontWeight: FontWeight.bold,
-                                      height: 1),
+                                // CSCPicker(
+                                //   onCountryChanged: (value) {
+                                //     setState(() {
+                                //       // countryValue = value;
+                                //     });
+                                //   },
+                                //   onStateChanged: (value) {
+                                //     setState(() {
+                                //       // stateValue = value;
+                                //     });
+                                //   },
+                                //   onCityChanged: (value) {
+                                //     setState(() {
+                                //       // stateValue = value;
+                                //     });
+                                //   },
+                                // ),
+                                InkWell(
+                                  onTap: () {},
+                                  child: Text(
+                                    'Location',
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                        color: Color.fromRGBO(0, 0, 0, 1),
+                                        fontFamily: 'Lato',
+                                        fontSize: 18,
+                                        letterSpacing:
+                                            0 /*percentages not used in flutter. defaulting to zero*/,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1),
+                                  ),
                                 ),
                                 SizedBox(height: deviceHeight * 0.01),
                                 TextField(

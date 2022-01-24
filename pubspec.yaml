@@ -24,6 +24,7 @@ dependencies:
   pin_code_fields: ^7.3.0
   custom_full_image_screen: ^0.0.4
   fluttertoast: ^8.0.8
+  csc_picker: ^0.2.6
 
 
 
