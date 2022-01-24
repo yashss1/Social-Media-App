@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_full_image_screen/custom_full_image_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
+import 'package:social_media/OtherScreens/all_followers.dart';
+import 'package:social_media/OtherScreens/all_following.dart';
 import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/friends_model.dart';
@@ -17,8 +18,9 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  var followers, following, frndList = [];
+  var followers, following, frndList = [], frndList2 = [];
   bool noFollowing = false;
+  bool noFollowers = false;
 
   Future getData() async {
     // Following Retrieval
@@ -39,8 +41,7 @@ class _UserPageState extends State<UserPage> {
       } else {
         setState(() {
           following = _doc['Following'];
-          print(UserDetails.uid);
-          print(following);
+          // print(following);
         });
       }
     }
@@ -52,9 +53,13 @@ class _UserPageState extends State<UserPage> {
         .get();
     bool docStatus1 = _doc1.exists;
     if (docStatus1 == false) {
+      setState(() {
+        noFollowers = true;
+      });
     } else {
       setState(() {
         followers = _doc1['Followers'];
+        print(followers);
       });
     }
   }
@@ -331,36 +336,59 @@ class _UserPageState extends State<UserPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Followed By :',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(0, 0, 0, 0.5),
-                                            fontFamily: 'Lato',
-                                            fontSize: 16,
-                                            letterSpacing:
-                                                0 /*percentages not used in flutter. defaulting to zero*/,
-                                            fontWeight: FontWeight.normal,
-                                            height: 1),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        followers == null
-                                            ? "0 People"
-                                            : '${followers.length} People',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color.fromRGBO(0, 0, 0, 1),
-                                            fontFamily: 'Lato',
-                                            fontSize: 16,
-                                            letterSpacing:
-                                                0 /*percentages not used in flutter. defaulting to zero*/,
-                                            fontWeight: FontWeight.normal,
-                                            height: 1),
-                                      )
-                                    ],
+                                  InkWell(
+                                    onTap: () {
+                                      noFollowers == true
+                                          ? ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "You dont have any Followers",
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ),
+                                              ),
+                                            )
+                                          : Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AllFollowers(
+                                                        array: followers,
+                                                      )));
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Followed By :',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(0, 0, 0, 0.5),
+                                              fontFamily: 'Lato',
+                                              fontSize: 16,
+                                              letterSpacing:
+                                                  0 /*percentages not used in flutter. defaulting to zero*/,
+                                              fontWeight: FontWeight.normal,
+                                              height: 1),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          followers == null
+                                              ? "0 People"
+                                              : '${followers.length} People',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              color: Colors.blue,
+                                              fontFamily: 'Lato',
+                                              fontSize: 16,
+                                              letterSpacing:
+                                                  0 /*percentages not used in flutter. defaulting to zero*/,
+                                              fontWeight: FontWeight.normal,
+                                              height: 1),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                   Row(
                                     children: [
@@ -406,7 +434,7 @@ class _UserPageState extends State<UserPage> {
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: const [
+                                children: [
                                   Text(
                                     'Following',
                                     textAlign: TextAlign.left,
@@ -419,19 +447,34 @@ class _UserPageState extends State<UserPage> {
                                         fontWeight: FontWeight.bold,
                                         height: 1),
                                   ),
-                                  Text(
-                                    'See All',
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(
-                                            0, 0, 0, 0.41999998688697815),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: FontWeight.normal,
-                                        height: 1),
-                                  ),
+                                  noFollowing == true
+                                      ? Container()
+                                      : frndList.length == 0
+                                          ? Container()
+                                          : InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AllFollowing(
+                                                              array: frndList,
+                                                            )));
+                                              },
+                                              child: Text(
+                                                'See All',
+                                                textAlign: TextAlign.left,
+                                                style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontFamily: 'Lato',
+                                                    fontSize: 14,
+                                                    letterSpacing:
+                                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    height: 1),
+                                              ),
+                                            ),
                                 ],
                               ),
                               SizedBox(height: 20),

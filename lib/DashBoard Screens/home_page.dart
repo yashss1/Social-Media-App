@@ -21,7 +21,6 @@ class _HomeState extends State<Home> {
   TextEditingController post = TextEditingController();
   bool showSpinner = false;
 
-
   void addIntoFirebase() async {
     setState(() {
       showSpinner = true;
@@ -35,7 +34,7 @@ class _HomeState extends State<Home> {
       'Message': post.text,
       'NumberOfComments': 0,
       'ProfilePhotoUrl': UserDetails.profilePhotoUrl,
-    }).then((value) {
+    }).then((value) async{
       // print(value);
       var documentId = value.id;
       FirebaseFirestore.instance.collection('Posts').doc(documentId).update({
@@ -318,5 +317,6 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+    // return Container();
   }
 }

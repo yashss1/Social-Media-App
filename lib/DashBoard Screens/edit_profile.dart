@@ -73,8 +73,8 @@ class _EditProfileState extends State<EditProfile> {
     final pickedImageFile = await imagePicker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 75,
-      maxWidth: 150,
     );
+    // await _cropImage1(pickedImageFile!.path);
     setState(() {
       _pickedImage = File(pickedImageFile!.path);
       isPicked = true;
