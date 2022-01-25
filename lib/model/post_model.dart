@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_media/OtherScreens/individual_post.dart';
@@ -144,6 +145,34 @@ class _PostModelState extends State<PostModel> {
     // print(formattedDateTime);
   }
 
+  // Tag User Function (redirect to UserPage)
+  Future getUserFromUsername(String word) async {
+    word = word.substring(1);
+    QuerySnapshot snap =
+        await FirebaseFirestore.instance.collection('Users').get();
+
+    final _snap = snap.docs;
+    // print(word);
+    for (int i = 0; i < _snap.length; i++) {
+      // bc khupch vel lagla
+      // print(_snap[i]['Info']['Uid']);
+      // print(_snap[i]['Info']['Username']);
+      if (_snap[i]['Info']['Username'] == word) {
+        /// Write your method here
+        print(_snap[i]['Info']['Uid']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(
+              array: _snap,
+              index: i,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -255,18 +284,43 @@ class _PostModelState extends State<PostModel> {
                         height: 1),
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    "${widget.array[widget.index]['Message']}",
-                    textAlign: TextAlign.left,
-                    maxLines: 5,
-                    style: TextStyle(
-                        color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
-                        fontFamily: 'Lato',
-                        fontSize: 15,
-                        letterSpacing:
-                            0 /*percentages not used in flutter. defaulting to zero*/,
-                        fontWeight: FontWeight.normal,
-                        height: 1),
+                  // Text(
+                  //   "${widget.array[widget.index]['Message']}",
+                  //   textAlign: TextAlign.left,
+                  //   maxLines: 5,
+                  //   style: TextStyle(
+                  //       color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
+                  //       fontFamily: 'Lato',
+                  //       fontSize: 15,
+                  //       letterSpacing:
+                  //           0 /*percentages not used in flutter. defaulting to zero*/,
+                  //       fontWeight: FontWeight.normal,
+                  //       height: 1),
+                  // ),
+                  RichText(
+                    text: TextSpan(
+                        children: widget.array[widget.index]['Message']
+                            .split(" ")
+                            .map<InlineSpan>(
+                      //ithe pn khup vel lagla (40min) inlinespan error
+                      (word) {
+                        // print(word);
+                        if (word.startsWith('@')) {
+                          return TextSpan(
+                              text: '$word ',
+                              style:
+                                  TextStyle(color: Colors.blue, fontSize: 17.0),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  getUserFromUsername(word).then((value) {});
+                                });
+                        }
+                        return TextSpan(
+                            text: '$word ',
+                            style: const TextStyle(
+                                fontSize: 17.0, color: Colors.black));
+                      },
+                    ).toList()),
                   ),
                   SizedBox(height: 10),
                   Container(
