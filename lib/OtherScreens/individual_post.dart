@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
+import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/comment_mdel.dart';
 import 'package:social_media/model/post_model.dart';
@@ -190,6 +191,105 @@ class _IndividualPostState extends State<IndividualPost> {
       time = formattedDateTime.substring(13);
     }
     // print(formattedDateTime);
+  }
+
+  deleteComment(String curr_doc) async {
+    // print("Delete Comment button pressed");
+    setState(() {
+      showSpinner = true;
+    });
+    Navigator.pop(context);
+
+    // Deleting the Comment Document
+    await FirebaseFirestore.instance
+        .collection("Posts")
+        .doc(widget.array[widget.index]['postId'])
+        .collection("Comments")
+        .doc(curr_doc)
+        .delete();
+    setState(() {
+      showSpinner = false;
+    });
+  }
+
+  void handleClick(int item, String curr_doc) async {
+    switch (item) {
+      case 0:
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0)),
+              elevation: 5,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                width: MediaQuery.of(context).size.width * .7,
+                height: 160,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Confirmation",
+                          style: TextStyle(
+                              color: pink,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Are you Sure you want to delete this Comment ?",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          InkWell(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () async {
+                              await deleteComment(curr_doc);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+        break;
+    }
   }
 
   @override
@@ -794,9 +894,62 @@ class _IndividualPostState extends State<IndividualPost> {
                                   itemBuilder: (context, index) {
                                     return Column(
                                       children: [
-                                        CommentModelz(
-                                          array: list,
-                                          index: index,
+                                        InkWell(
+                                          // onTap: () async {
+                                          //   List array = [];
+                                          //   var _doc1 = await FirebaseFirestore
+                                          //       .instance
+                                          //       .collection("Users")
+                                          //       .doc(list[index]['CommentedBy'])
+                                          //       .get();
+                                          //   bool docStatus1 = _doc1.exists;
+                                          //   if (docStatus1 == true) {
+                                          //     array.add(_doc1);
+                                          //     if (list[index]['CommentedBy'] ==
+                                          //         UserDetails.uid) {
+                                          //     } else {
+                                          //       Navigator.push(
+                                          //         context,
+                                          //         MaterialPageRoute(
+                                          //           builder: (context) =>
+                                          //               ProfilePage(
+                                          //             array: array,
+                                          //             index: 0,
+                                          //           ),
+                                          //         ),
+                                          //       );
+                                          //     }
+                                          //   }
+                                          // },
+                                          child: Stack(
+                                            children: [
+                                              CommentModelz(
+                                                array: list,
+                                                index: index,
+                                              ),
+                                              UserDetails.uid ==
+                                                      list[index]['CommentedBy']
+                                                  ? Positioned(
+                                                      top: 5,
+                                                      right: 10,
+                                                      child: PopupMenuButton(
+                                                        onSelected: (item) =>
+                                                            handleClick(
+                                                                0,
+                                                                list[index][
+                                                                    'commentId']),
+                                                        itemBuilder:
+                                                            (context) => [
+                                                          PopupMenuItem<int>(
+                                                              value: 0,
+                                                              child: Text(
+                                                                  'Delete')),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                            ],
+                                          ),
                                         ),
                                         if (index == list.length - 1)
                                           SizedBox(height: 80),
