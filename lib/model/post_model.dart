@@ -144,624 +144,484 @@ class _PostModelState extends State<PostModel> {
     // print(formattedDateTime);
   }
 
-  deletePost() async {
-    // print("Delete Post button pressed");
-    setState(() {
-      showSpinner = true;
-    });
-    Navigator.pop(context);
-
-    //Deleting Likes Collection
-    final instance = FirebaseFirestore.instance;
-    final batch = instance.batch();
-    var collection = instance
-        .collection('Posts')
-        .doc(widget.array[widget.index]['postId'])
-        .collection("Likes");
-    var snapshots = await collection.get();
-    for (var doc in snapshots.docs) {
-      batch.delete(doc.reference);
-    }
-    await batch.commit();
-
-    //Deleting Likes Collection
-    final instance2 = FirebaseFirestore.instance;
-    final batch2 = instance2.batch();
-    var collection2 = instance2
-        .collection('Posts')
-        .doc(widget.array[widget.index]['postId'])
-        .collection("Comments");
-    var snapshots2 = await collection2.get();
-    for (var doc in snapshots2.docs) {
-      batch2.delete(doc.reference);
-    }
-    await batch2.commit();
-
-    // Deleting the Post Document
-    await FirebaseFirestore.instance
-        .collection("Posts")
-        .doc(widget.array[widget.index]['postId'])
-        .delete();
-    setState(() {
-      showSpinner = false;
-    });
-  }
-
-  void handleClick(int item) async {
-    switch (item) {
-      case 0:
-        await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0)),
-              elevation: 5,
-              child: Container(
-                padding: EdgeInsets.all(15),
-                width: MediaQuery.of(context).size.width * .7,
-                height: 160,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Confirmation",
-                          style: TextStyle(
-                              color: pink,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Are you Sure you want to delete this Post ?",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            child: Text(
-                              "Cancel",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          InkWell(
-                            child: Text(
-                              "Delete",
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            onTap: () async {
-                              await deletePost();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Stack(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () async {
-                      List array = [];
-                      var _doc1 = await FirebaseFirestore.instance
-                          .collection("Users")
-                          .doc(widget.array[widget.index]['AddedBy'])
-                          .get();
-                      bool docStatus1 = _doc1.exists;
-                      if (docStatus1 == true) {
-                        array.add(_doc1);
-                        if (array[0]['Info']['Uid'] == UserDetails.uid) {
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfilePage(
-                                array: array,
-                                index: 0,
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(100, 94, 94, 1),
-                        image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                '${widget.array[widget.index]['ProfilePhotoUrl']}'),
-                            fit: BoxFit.fitWidth),
-                        borderRadius:
-                            BorderRadius.all(Radius.elliptical(36, 36)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 10),
               InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IndividualPost(
-                        array: widget.array,
-                        index: widget.index,
-                      ),
-                    ),
-                  );
+                onTap: () async {
+                  List array = [];
+                  var _doc1 = await FirebaseFirestore.instance
+                      .collection("Users")
+                      .doc(widget.array[widget.index]['AddedBy'])
+                      .get();
+                  bool docStatus1 = _doc1.exists;
+                  if (docStatus1 == true) {
+                    array.add(_doc1);
+                    if (array[0]['Info']['Uid'] == UserDetails.uid) {
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                            array: array,
+                            index: 0,
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 },
                 child: Container(
-                  width: deviceWidth - 78,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${widget.array[widget.index]['Name']}",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 1),
-                            fontFamily: 'Lato',
-                            fontSize: 17,
-                            letterSpacing:
-                                0 /*percentages not used in flutter. defaulting to zero*/,
-                            fontWeight: FontWeight.normal,
-                            height: 1),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "@${widget.array[widget.index]['Username']}",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 0.8100000023841858),
-                            fontFamily: 'Lato',
-                            fontSize: 15,
-                            letterSpacing:
-                                0 /*percentages not used in flutter. defaulting to zero*/,
-                            fontWeight: FontWeight.normal,
-                            height: 1),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "${date} ${time}",
-                        textAlign: TextAlign.left,
-                        maxLines: 5,
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
-                            fontFamily: 'Lato',
-                            fontSize: 12,
-                            letterSpacing:
-                                0 /*percentages not used in flutter. defaulting to zero*/,
-                            fontWeight: FontWeight.normal,
-                            height: 1),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "${widget.array[widget.index]['Message']}",
-                        textAlign: TextAlign.left,
-                        maxLines: 5,
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
-                            fontFamily: 'Lato',
-                            fontSize: 15,
-                            letterSpacing:
-                                0 /*percentages not used in flutter. defaulting to zero*/,
-                            fontWeight: FontWeight.normal,
-                            height: 1),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: deviceWidth * 0.8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 1) {
-                                  likePost(0);
-                                } else {
-                                  likePost(1);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -11.png"),
-                                    color: Colors.pink,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[1]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 1
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 1
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 2) {
-                                  likePost(0);
-                                } else {
-                                  likePost(2);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -12.png"),
-                                    color: Colors.pink,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[2]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 2
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 2
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 3) {
-                                  likePost(0);
-                                } else {
-                                  likePost(3);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -13.png"),
-                                    color: Colors.pink,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[3]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 3
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 3
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 4) {
-                                  likePost(0);
-                                } else {
-                                  likePost(4);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -14.png"),
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[4]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 4
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 4
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 5) {
-                                  likePost(0);
-                                } else {
-                                  likePost(5);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -8.png"),
-                                    color: Colors.blue,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[5]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 5
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 5
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 6) {
-                                  likePost(0);
-                                } else {
-                                  likePost(6);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -16.png"),
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[6]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 6
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 6
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 7) {
-                                  likePost(0);
-                                } else {
-                                  likePost(7);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Recommend-1.png"),
-                                    color: Colors.greenAccent,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[7]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 7
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 7
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => IndividualPost(
-                                      array: widget.array,
-                                      index: widget.index,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -10.png"),
-                                    color: Colors.greenAccent,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${numberOfComments}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 9) {
-                                  likePost(0);
-                                } else {
-                                  likePost(9);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/wow-1.png"),
-                                    color: Colors.yellow,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[9]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 9
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 9
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                if (liked_button == 10) {
-                                  likePost(0);
-                                } else {
-                                  likePost(10);
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  ImageIcon(
-                                    AssetImage("assets/images/Image -18.png"),
-                                    color: Colors.black,
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${likes[10]}",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color: liked_button == 10
-                                            ? pink
-                                            : Color.fromRGBO(0, 0, 0, 1),
-                                        fontFamily: 'Lato',
-                                        fontSize: 14,
-                                        letterSpacing:
-                                            0 /*percentages not used in flutter. defaulting to zero*/,
-                                        fontWeight: liked_button == 10
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        height: 1),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                    ],
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(100, 94, 94, 1),
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider(
+                            '${widget.array[widget.index]['ProfilePhotoUrl']}'),
+                        fit: BoxFit.fitWidth),
+                    borderRadius: BorderRadius.all(Radius.elliptical(36, 36)),
                   ),
                 ),
               ),
             ],
           ),
-          UserDetails.uid == widget.array[widget.index]['AddedBy']
-              ? Positioned(
-                  top: 5,
-                  right: 10,
-                  child: PopupMenuButton(
-                    onSelected: (item) => handleClick(0),
-                    itemBuilder: (context) => [
-                      PopupMenuItem<int>(value: 0, child: Text('Delete')),
-                    ],
+          const SizedBox(width: 10),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => IndividualPost(
+                    array: widget.array,
+                    index: widget.index,
                   ),
-                )
-              : Container(),
+                ),
+              );
+            },
+            child: Container(
+              width: deviceWidth - 78,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "${widget.array[widget.index]['Name']}",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 1),
+                        fontFamily: 'Lato',
+                        fontSize: 17,
+                        letterSpacing:
+                            0 /*percentages not used in flutter. defaulting to zero*/,
+                        fontWeight: FontWeight.normal,
+                        height: 1),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    "@${widget.array[widget.index]['Username']}",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 0.8100000023841858),
+                        fontFamily: 'Lato',
+                        fontSize: 15,
+                        letterSpacing:
+                            0 /*percentages not used in flutter. defaulting to zero*/,
+                        fontWeight: FontWeight.normal,
+                        height: 1),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "${date} ${time}",
+                    textAlign: TextAlign.left,
+                    maxLines: 5,
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
+                        fontFamily: 'Lato',
+                        fontSize: 12,
+                        letterSpacing:
+                            0 /*percentages not used in flutter. defaulting to zero*/,
+                        fontWeight: FontWeight.normal,
+                        height: 1),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "${widget.array[widget.index]['Message']}",
+                    textAlign: TextAlign.left,
+                    maxLines: 5,
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 0.949999988079071),
+                        fontFamily: 'Lato',
+                        fontSize: 15,
+                        letterSpacing:
+                            0 /*percentages not used in flutter. defaulting to zero*/,
+                        fontWeight: FontWeight.normal,
+                        height: 1),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: deviceWidth * 0.8,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 1) {
+                              likePost(0);
+                            } else {
+                              likePost(1);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -11.png"),
+                                color: Colors.pink,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[1]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 1
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 1
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 2) {
+                              likePost(0);
+                            } else {
+                              likePost(2);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -12.png"),
+                                color: Colors.pink,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[2]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 2
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 2
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 3) {
+                              likePost(0);
+                            } else {
+                              likePost(3);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -13.png"),
+                                color: Colors.pink,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[3]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 3
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 3
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 4) {
+                              likePost(0);
+                            } else {
+                              likePost(4);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -14.png"),
+                                color: Colors.red,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[4]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 4
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 4
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 5) {
+                              likePost(0);
+                            } else {
+                              likePost(5);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -8.png"),
+                                color: Colors.blue,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[5]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 5
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 5
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 6) {
+                              likePost(0);
+                            } else {
+                              likePost(6);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -16.png"),
+                                color: Colors.red,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[6]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 6
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 6
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 7) {
+                              likePost(0);
+                            } else {
+                              likePost(7);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Recommend-1.png"),
+                                color: Colors.greenAccent,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[7]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 7
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 7
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => IndividualPost(
+                                  array: widget.array,
+                                  index: widget.index,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -10.png"),
+                                color: Colors.greenAccent,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${numberOfComments}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 9) {
+                              likePost(0);
+                            } else {
+                              likePost(9);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/wow-1.png"),
+                                color: Colors.yellow,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[9]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 9
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 9
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (liked_button == 10) {
+                              likePost(0);
+                            } else {
+                              likePost(10);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ImageIcon(
+                                AssetImage("assets/images/Image -18.png"),
+                                color: Colors.black,
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                "${likes[10]}",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: liked_button == 10
+                                        ? pink
+                                        : Color.fromRGBO(0, 0, 0, 1),
+                                    fontFamily: 'Lato',
+                                    fontSize: 14,
+                                    letterSpacing:
+                                        0 /*percentages not used in flutter. defaulting to zero*/,
+                                    fontWeight: liked_button == 10
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    height: 1),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

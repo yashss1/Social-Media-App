@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
       'Message': post.text,
       'NumberOfComments': 0,
       'ProfilePhotoUrl': UserDetails.profilePhotoUrl,
-    }).then((value) async{
+    }).then((value) async {
       // print(value);
       var documentId = value.id;
       FirebaseFirestore.instance.collection('Posts').doc(documentId).update({
@@ -53,6 +53,122 @@ class _HomeState extends State<Home> {
         ),
       );
     });
+  }
+
+  deletePost(String postId) async {
+    // print("Delete Post button pressed");
+    setState(() {
+      showSpinner = true;
+    });
+    Navigator.pop(context);
+
+    //Deleting Likes Collection
+    final instance = FirebaseFirestore.instance;
+    final batch = instance.batch();
+    var collection =
+        instance.collection('Posts').doc(postId).collection("Likes");
+    var snapshots = await collection.get();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+
+    //Deleting Likes Collection
+    final instance2 = FirebaseFirestore.instance;
+    final batch2 = instance2.batch();
+    var collection2 =
+        instance2.collection('Posts').doc(postId).collection("Comments");
+    var snapshots2 = await collection2.get();
+    for (var doc in snapshots2.docs) {
+      batch2.delete(doc.reference);
+    }
+    await batch2.commit();
+
+    // Deleting the Post Document
+    await FirebaseFirestore.instance.collection("Posts").doc(postId).delete();
+    setState(() {
+      showSpinner = false;
+    });
+  }
+
+  void handleClick(int item, String postId) async {
+    switch (item) {
+      case 0:
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0)),
+              elevation: 5,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                width: MediaQuery.of(context).size.width * .7,
+                height: 160,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Confirmation",
+                          style: TextStyle(
+                              color: pink,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Are you Sure you want to delete this Post ?",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          InkWell(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () async {
+                              await deletePost(postId);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+        break;
+    }
   }
 
   @override
@@ -295,9 +411,34 @@ class _HomeState extends State<Home> {
                                   itemBuilder: (context, index) {
                                     return Column(
                                       children: [
-                                        PostModel(
-                                          array: list,
-                                          index: index,
+                                        Stack(
+                                          children: [
+                                            PostModel(
+                                              array: list,
+                                              index: index,
+                                            ),
+                                            UserDetails.uid ==
+                                                    list[index]['AddedBy']
+                                                ? Positioned(
+                                                    top: 5,
+                                                    right: 10,
+                                                    child: PopupMenuButton(
+                                                      onSelected: (item) =>
+                                                          handleClick(
+                                                              0,
+                                                              list[index]
+                                                                  ['postId']),
+                                                      itemBuilder: (context) =>
+                                                          [
+                                                        PopupMenuItem<int>(
+                                                            value: 0,
+                                                            child:
+                                                                Text('Delete')),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Container(),
+                                          ],
                                         ),
                                         if (index == list.length - 1)
                                           SizedBox(height: 80),
