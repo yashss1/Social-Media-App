@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/Services/user_details.dart';
 
 class ChatTextField extends StatefulWidget {
-  const ChatTextField({Key? key}) : super(key: key);
+  const ChatTextField({Key? key, this.array, this.index, this.chatRoomId})
+      : super(key: key);
+
+  final array, index, chatRoomId;
 
   @override
   _ChatTextFieldState createState() => _ChatTextFieldState();
@@ -9,6 +14,52 @@ class ChatTextField extends StatefulWidget {
 
 class _ChatTextFieldState extends State<ChatTextField> {
   TextEditingController message = TextEditingController();
+
+  void onSendMessage() async {
+    if (message.text.isNotEmpty) {
+      Map<String, dynamic> messages = {
+        "SendBy": UserDetails.name,
+        "Message": message.text,
+        "Type": "Text",
+        "Time": FieldValue.serverTimestamp(),
+      };
+
+      message.clear();
+      await FirebaseFirestore.instance
+          .collection('ChatRooms')
+          .doc(widget.chatRoomId)
+          .collection('Chats')
+          .add(messages);
+
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(UserDetails.uid)
+          .collection("LastChat")
+          .doc(widget.array[widget.index]['Info']['Uid'])
+          .set({
+        "LastMsg": messages['Message'],
+        "Type": messages['Type'],
+        "Time": messages['Time'],
+        "ChatRoomId": widget.chatRoomId,
+        "ChatWith": widget.array[widget.index]['Info']['Uid'],
+      });
+
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(widget.array[widget.index]['Info']['Uid'])
+          .collection("LastChat")
+          .doc(UserDetails.uid)
+          .set({
+        "LastMsg": messages['Message'],
+        "Type": messages['Type'],
+        "Time": messages['Time'],
+        "ChatRoomId": widget.chatRoomId,
+        "ChatWith": UserDetails.uid,
+      });
+    } else {
+      print("Enter Some Text");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +110,9 @@ class _ChatTextFieldState extends State<ChatTextField> {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              onSendMessage();
+            },
             icon: const Icon(
               Icons.send,
               color: Colors.pink,

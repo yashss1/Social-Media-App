@@ -8,7 +8,10 @@ import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 
 class ChatMesssages extends StatefulWidget {
-  const ChatMesssages({Key? key}) : super(key: key);
+  const ChatMesssages({Key? key, this.array, this.index, this.chatRoomId})
+      : super(key: key);
+
+  final array, index, chatRoomId;
 
   @override
   _ChatMesssagesState createState() => _ChatMesssagesState();
@@ -25,39 +28,51 @@ class _ChatMesssagesState extends State<ChatMesssages> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            chatBubble(
-                image: UserDetails.profilePhotoUrl!,
-                message: "SDsdddddddjksmnnnnnnnnnnnsdsd",
-                isSender: false),
-            chatBubble(
-                image: UserDetails.profilePhotoUrl!,
-                message:
-                    "SDdfffffffffffbbbbbbbbbsssssssssssssssssssssssssssssssssssssssssssssssssssssssaaaaaaaaiiiiiiiiiisdsdsd",
-                isSender: true),
-            SizedBox(height: 50),
-          ],
-        ),
-      ),
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('ChatRooms')
+          .doc(widget.chatRoomId)
+          .collection('Chats')
+          .orderBy("Time", descending: true)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.data != null) {
+          return ListView.builder(
+            reverse: true,
+            physics: BouncingScrollPhysics(),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              Map<String, dynamic> map =
+                  snapshot.data!.docs[index].data() as Map<String, dynamic>;
+              // print(map);
+              return chatBubble(
+                mp: map,
+                array: widget.array,
+                index: widget.index,
+                isSender: map['SendBy'] == UserDetails.name,
+              );
+            },
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }
 
 class chatBubble extends StatelessWidget {
-  final String image, message;
+  final mp, array, index;
   final bool isSender;
   final Function()? ontap;
 
   const chatBubble({
     Key? key,
     this.ontap,
-    required this.image,
-    required this.message,
     required this.isSender,
+    this.mp,
+    this.array,
+    this.index,
   }) : super(key: key);
 
   @override
@@ -81,7 +96,8 @@ class chatBubble extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(100, 94, 94, 1),
                           image: DecorationImage(
-                              image: CachedNetworkImageProvider("${image}"),
+                              image: CachedNetworkImageProvider(
+                                  array[index]['Info']['ProfilePhotoUrl']),
                               fit: BoxFit.fitWidth),
                           borderRadius:
                               BorderRadius.all(Radius.elliptical(36, 36)),
@@ -91,12 +107,12 @@ class chatBubble extends StatelessWidget {
                 Column(
                   children: [
                     BubbleNormal(
-                      text: message,
+                      text: mp['Message'],
                       isSender: false,
                       color: isSender == true
                           ? pink
                           : Color.fromRGBO(244, 244, 244, 1),
-                      tail: true,
+                      tail: false,
                       textStyle: TextStyle(
                         fontSize: 20,
                         color: isSender == true ? Colors.white : Colors.black,
@@ -111,7 +127,8 @@ class chatBubble extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(100, 94, 94, 1),
                           image: DecorationImage(
-                              image: CachedNetworkImageProvider("${image}"),
+                              image: CachedNetworkImageProvider(
+                                  UserDetails.profilePhotoUrl!),
                               fit: BoxFit.fitWidth),
                           borderRadius:
                               BorderRadius.all(Radius.elliptical(36, 36)),
