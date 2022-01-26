@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
 import 'package:social_media/DashBoard%20Screens/home_page.dart';
+import 'package:social_media/Services/authentication_helper.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/Verification%20Screens/phone_verification.dart';
 
@@ -43,7 +45,12 @@ class GetUserData extends StatelessWidget {
             UserDetails.location = data['Info']['Location'];
             UserDetails.phone = data['Info']['PhoneNumber'];
 
-            if(UserDetails.phone=="0000000000"){
+            FirebaseMessaging.instance.getToken().then((value) {
+              AuthenticationHelper().storeToken(value);
+              // print(value);
+            });
+
+            if (UserDetails.phone == "0000000000") {
               return PhoneVerify();
             }
 
