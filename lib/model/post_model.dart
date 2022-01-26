@@ -234,6 +234,7 @@ class _PostModelState extends State<PostModel> {
                   builder: (context) => IndividualPost(
                     array: widget.array,
                     index: widget.index,
+                    nComments: numberOfComments,
                   ),
                 ),
               );
@@ -574,6 +575,7 @@ class _PostModelState extends State<PostModel> {
                                 builder: (context) => IndividualPost(
                                   array: widget.array,
                                   index: widget.index,
+                                  nComments: numberOfComments,
                                 ),
                               ),
                             );

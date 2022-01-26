@@ -14,9 +14,9 @@ import 'package:social_media/model/post_model.dart';
 import '../constants.dart';
 
 class IndividualPost extends StatefulWidget {
-  const IndividualPost({Key? key, this.array, this.index}) : super(key: key);
+  const IndividualPost({Key? key, this.array, this.index, this.nComments}) : super(key: key);
 
-  final array, index;
+  final array, index, nComments;
 
   @override
   _IndividualPostState createState() => _IndividualPostState();
@@ -169,6 +169,7 @@ class _IndividualPostState extends State<IndividualPost> {
   @override
   void initState() {
     super.initState();
+    numberOfComments = widget.nComments;
     getInitData().then((value) {
       setState(() {});
     });
@@ -277,6 +278,9 @@ class _IndividualPostState extends State<IndividualPost> {
                             ),
                             onTap: () async {
                               await deleteComment(curr_doc);
+                              setState(() {
+                                numberOfComments -= 1;
+                              });
                             },
                           ),
                         ],
@@ -664,7 +668,7 @@ class _IndividualPostState extends State<IndividualPost> {
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              "${max(numberOfComments, list.length)}",
+                                              "${max(numberOfComments, 0)}",
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
                                                   color: Color.fromRGBO(

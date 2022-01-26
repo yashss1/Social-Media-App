@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/Services/user_details.dart';
@@ -15,6 +16,12 @@ class ChatMesssages extends StatefulWidget {
 
 class _ChatMesssagesState extends State<ChatMesssages> {
   String text = "sdsadsa @yashss1", uid = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +40,6 @@ class _ChatMesssagesState extends State<ChatMesssages> {
                     "SDdfffffffffffbbbbbbbbbsssssssssssssssssssssssssssssssssssssssssssssssssssssssaaaaaaaaiiiiiiiiiisdsdsd",
                 isSender: true),
             SizedBox(height: 50),
-
           ],
         ),
       ),

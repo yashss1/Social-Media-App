@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_media/Verification%20Screens/verification_screen.dart';
 
 class AuthenticationHelper {
@@ -33,8 +34,9 @@ class AuthenticationHelper {
 
   //SignOut Method
   Future signOut(context) async {
+    await AuthenticationHelper().removeToken();
     await _auth.signOut();
-    print('signout');
+    // print('signout');
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -44,6 +46,7 @@ class AuthenticationHelper {
 
   //getUserDetails
   Future<void> storeUserDetails(name, username) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     final CollectionReference userCollection =
         FirebaseFirestore.instance.collection('Users');
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -59,7 +62,8 @@ class AuthenticationHelper {
             "Email": email,
             "Uid": uid,
             "IsAdmin": false,
-            "BgPhotoUrl":"https://img.freepik.com/free-photo/empty-wooden-blurred-nature-backdrop-wood-table-top_43620-5.jpg?size=626&ext=jpg",
+            "BgPhotoUrl":
+                "https://img.freepik.com/free-photo/empty-wooden-blurred-nature-backdrop-wood-table-top_43620-5.jpg?size=626&ext=jpg",
             "ProfilePhotoUrl":
                 "https://freesvg.org/img/abstract-user-flat-4.png",
             "TagLine": "Husband,Father,Hard Worker",
@@ -92,8 +96,8 @@ class AuthenticationHelper {
             "Profession": profession,
             "Location": location,
             "DOB": date,
-            "ProfilePhotoUrl" :imageUrl,
-            "BgPhotoUrl":bgImageUrl,
+            "ProfilePhotoUrl": imageUrl,
+            "BgPhotoUrl": bgImageUrl,
           }
         }, SetOptions(merge: true))
         .then((value) => print("User Details Updated"))
@@ -102,4 +106,43 @@ class AuthenticationHelper {
     return;
   }
 
+  // Store Token
+  Future<void> storeToken(token) async {
+    final CollectionReference userCollection =
+        FirebaseFirestore.instance.collection('Users');
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid.toString();
+
+    userCollection
+        .doc(uid)
+        .set({
+          "Info": {
+            "Token": token,
+          }
+        }, SetOptions(merge: true))
+        .then((value) => print("User Token Updated"))
+        .catchError((error) => print("Failed to Update Token: $error"));
+
+    return;
+  }
+
+  // Store Token
+  Future<void> removeToken() async {
+    final CollectionReference userCollection =
+        FirebaseFirestore.instance.collection('Users');
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid.toString();
+
+    userCollection
+        .doc(uid)
+        .set({
+          "Info": {
+            "Token": "token",
+          }
+        }, SetOptions(merge: true))
+        .then((value) => print("User Token Deleted"))
+        .catchError((error) => print("Failed to delete Token: $error"));
+
+    return;
+  }
 }
