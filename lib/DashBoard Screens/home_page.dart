@@ -228,7 +228,7 @@ class _HomeState extends State<Home> {
                               image: DecorationImage(
                                   image: CachedNetworkImageProvider(
                                       "${UserDetails.profilePhotoUrl}"),
-                                  fit: BoxFit.fitWidth),
+                                  fit: BoxFit.cover),
                               borderRadius: BorderRadius.all(Radius.elliptical(
                                   34.14285659790039, 32.590911865234375)),
                             ))
@@ -301,7 +301,7 @@ class _HomeState extends State<Home> {
                                         image: DecorationImage(
                                             image: CachedNetworkImageProvider(
                                                 "${UserDetails.profilePhotoUrl}"),
-                                            fit: BoxFit.fitWidth),
+                                            fit: BoxFit.cover),
                                         borderRadius: BorderRadius.all(
                                             Radius.elliptical(52, 52)),
                                       )),

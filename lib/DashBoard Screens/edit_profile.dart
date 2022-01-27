@@ -181,12 +181,13 @@ class _EditProfileState extends State<EditProfile> {
                                     //         'assets/images/Rectangle10 (1).png'),
                                     //     fit: BoxFit.fitWidth),
                                     image: DecorationImage(
-                                        image: isPicked2
-                                            ? FileImage(_pickedImage2)
-                                                as ImageProvider
-                                            : CachedNetworkImageProvider(
-                                                "${UserDetails.bgPhotoUrl}"),
-                                        fit: BoxFit.fitWidth),
+                                      image: isPicked2
+                                          ? FileImage(_pickedImage2)
+                                              as ImageProvider
+                                          : CachedNetworkImageProvider(
+                                              "${UserDetails.bgPhotoUrl}"),
+                                      fit: BoxFit.fitWidth,
+                                    ),
                                   ),
                                 ),
                                 Align(
@@ -201,12 +202,13 @@ class _EditProfileState extends State<EditProfile> {
                                             color: Color.fromRGBO(
                                                 196, 196, 196, 1),
                                             image: DecorationImage(
-                                                image: isPicked
-                                                    ? FileImage(_pickedImage)
-                                                        as ImageProvider
-                                                    : CachedNetworkImageProvider(
-                                                        "${UserDetails.profilePhotoUrl}"),
-                                                fit: BoxFit.fitWidth),
+                                              image: isPicked
+                                                  ? FileImage(_pickedImage)
+                                                      as ImageProvider
+                                                  : CachedNetworkImageProvider(
+                                                      "${UserDetails.profilePhotoUrl}"),
+                                              fit: BoxFit.cover,
+                                            ),
                                             borderRadius: BorderRadius.all(
                                                 Radius.elliptical(125, 122)),
                                           ),

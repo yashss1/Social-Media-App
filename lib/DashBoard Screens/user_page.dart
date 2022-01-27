@@ -175,7 +175,7 @@ class _UserPageState extends State<UserPage> {
                                   imageWidth: 125,
                                   imageHeight: 122,
                                   imageBorderRadius: 125,
-                                  imageFit: BoxFit.fitWidth,
+                                  imageFit: BoxFit.cover,
                                   imageDetailsHeight: 450,
                                   imageDetailsWidth: 450,
                                   withHeroAnimation: true,
