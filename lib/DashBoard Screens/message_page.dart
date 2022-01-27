@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/OtherScreens/all_user_chat.dart';
 import 'package:social_media/OtherScreens/chat_skeleton.dart';
+import 'package:social_media/OtherScreens/group_create.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/recent_chat.dart';
 
@@ -183,7 +184,7 @@ class _MessagePageState extends State<MessagePage> {
                                       itemBuilder: (context, index) {
                                         return RecentChat(
                                           uid: _snap[index]['ChatWith'],
-                                          lastMsg :_snap[index]['LastMsg'],
+                                          lastMsg: _snap[index]['LastMsg'],
                                           ontap: () {
                                             Navigator.push(
                                               context,
@@ -207,23 +208,46 @@ class _MessagePageState extends State<MessagePage> {
               Positioned(
                 bottom: 100,
                 right: 30,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.pink,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.add),
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AllUserChatPage(),
-                        ),
-                      );
-                    },
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.pink,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.add),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AllUserChatPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.pink,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.group_add),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GroupCreate(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
