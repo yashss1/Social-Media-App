@@ -254,7 +254,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .doc(widget.array[widget.index]['Info']['Uid'])
         .set({
       'Followers': arrayNew2,
-    }).then((value)async {
+    }).then((value) async {
       // Followers Retrieval
       var _doc1 = await FirebaseFirestore.instance
           .collection("Followers")
@@ -440,7 +440,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   imageWidth: 125,
                                   imageHeight: 122,
                                   imageBorderRadius: 125,
-                                  imageFit: BoxFit.fitWidth,
+                                  imageFit: BoxFit.cover,
                                   imageDetailsHeight: 450,
                                   imageDetailsWidth: 450,
                                   withHeroAnimation: true,
