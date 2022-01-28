@@ -6,26 +6,30 @@ import 'package:image_picker/image_picker.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class ChatTextField extends StatefulWidget {
-  const ChatTextField({Key? key, this.array, this.index, this.chatRoomId})
+class ChatTextFieldGrp extends StatefulWidget {
+  const ChatTextFieldGrp(
+      {Key? key, this.array, this.myIndex, this.chatRoomId, this.grpName})
       : super(key: key);
 
-  final array, index, chatRoomId;
+  final array, myIndex, chatRoomId, grpName;
 
   @override
-  _ChatTextFieldState createState() => _ChatTextFieldState();
+  _ChatTextFieldGrpState createState() => _ChatTextFieldGrpState();
 }
 
-class _ChatTextFieldState extends State<ChatTextField> {
+class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
   TextEditingController message = TextEditingController();
 
   void onSendMessage() async {
     if (message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
-        "SendBy": UserDetails.name,
         "Message": message.text,
+        "SendBy": UserDetails.uid,
         "Type": "Text",
         "Time": FieldValue.serverTimestamp(),
+        "ChatRoomId": widget.chatRoomId,
+        "IsGroup": "Yes",
+        "UserIdx": widget.myIndex,
       };
 
       message.clear();
@@ -47,37 +51,39 @@ class _ChatTextFieldState extends State<ChatTextField> {
           .update({"ChatId": chatId});
 
       await FirebaseFirestore.instance
-          .collection('ChatRooms')
+          .collection("Users")
+          .doc(UserDetails.uid)
+          .collection("LastChat")
           .doc(widget.chatRoomId)
-          .set({"isGroup": "No"});
-
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(UserDetails.uid)
-          .collection("LastChat")
-          .doc(widget.array[widget.index]['Info']['Uid'])
           .set({
-        "LastMsg": messages['Message'],
-        "Type": messages['Type'],
-        "Time": messages['Time'],
+        "GroupName": widget.grpName,
+        "LastMsg": message.text,
+        "Type": "Normal Message",
+        "Time": FieldValue.serverTimestamp(),
         "ChatRoomId": widget.chatRoomId,
-        "ChatWith": widget.array[widget.index]['Info']['Uid'],
-        "IsGroup":"No",
+        "IsGroup": "Yes",
       });
 
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(widget.array[widget.index]['Info']['Uid'])
-          .collection("LastChat")
-          .doc(UserDetails.uid)
-          .set({
-        "LastMsg": messages['Message'],
-        "Type": messages['Type'],
-        "Time": messages['Time'],
-        "ChatRoomId": widget.chatRoomId,
-        "ChatWith": UserDetails.uid,
-        "IsGroup":"No",
-      });
+      //for loop lav for all members except u
+      for (int i = 0; i < widget.array.length; i++) {
+        if (widget.myIndex == i)
+          continue;
+        else {
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(widget.array[i]['Info']['Uid'])
+              .collection("LastChat")
+              .doc(widget.chatRoomId)
+              .set({
+            "GroupName": widget.grpName,
+            "LastMsg": message.text,
+            "Type": "Normal Message",
+            "Time": FieldValue.serverTimestamp(),
+            "ChatRoomId": widget.chatRoomId,
+            "IsGroup": "Yes",
+          });
+        }
+      }
     } else {
       print("Enter Some Text");
     }
@@ -114,10 +120,13 @@ class _ChatTextFieldState extends State<ChatTextField> {
         .doc(widget.chatRoomId)
         .collection('Chats')
         .add({
-      "SendBy": UserDetails.name,
-      "Message": "",
+      "Message": message.text,
+      "SendBy": UserDetails.uid,
       "Type": "Image",
       "Time": FieldValue.serverTimestamp(),
+      "ChatRoomId": widget.chatRoomId,
+      "IsGroup": "Yes",
+      "UserIdx": widget.myIndex,
     }).then((value) async {
       // print(value);
       documentId = value.id;
@@ -126,7 +135,7 @@ class _ChatTextFieldState extends State<ChatTextField> {
     var time = DateTime.now().millisecondsSinceEpoch.toString();
     firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
         .ref()
-        .child('ChatImages')
+        .child('GrpChatImages')
         .child('$time');
 
     var uploadTask = await ref.putFile(_pickedImage).catchError((error) async {
@@ -152,27 +161,36 @@ class _ChatTextFieldState extends State<ChatTextField> {
           .collection("Users")
           .doc(UserDetails.uid)
           .collection("LastChat")
-          .doc(widget.array[widget.index]['Info']['Uid'])
+          .doc(widget.chatRoomId)
           .set({
-        "LastMsg": "Image",
-        "Type": "Image",
+        "GroupName": widget.grpName,
+        "LastMsg": "Image..",
+        "Type": "Normal Image Message",
         "Time": FieldValue.serverTimestamp(),
         "ChatRoomId": widget.chatRoomId,
-        "ChatWith": widget.array[widget.index]['Info']['Uid'],
+        "IsGroup": "Yes",
       });
 
-      await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(widget.array[widget.index]['Info']['Uid'])
-          .collection("LastChat")
-          .doc(UserDetails.uid)
-          .set({
-        "LastMsg": "Image",
-        "Type": "Image",
-        "Time": FieldValue.serverTimestamp(),
-        "ChatRoomId": widget.chatRoomId,
-        "ChatWith": UserDetails.uid,
-      });
+      //for loop lav for all members except u
+      for (int i = 0; i < widget.array.length; i++) {
+        if (widget.myIndex == i)
+          continue;
+        else {
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(widget.array[i]['Info']['Uid'])
+              .collection("LastChat")
+              .doc(widget.chatRoomId)
+              .set({
+            "GroupName": widget.grpName,
+            "LastMsg": "Image..",
+            "Type": "Normal Image Message",
+            "Time": FieldValue.serverTimestamp(),
+            "ChatRoomId": widget.chatRoomId,
+            "IsGroup": "Yes",
+          });
+        }
+      }
 
       // print(imageUrl);
     }
