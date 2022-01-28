@@ -3,9 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/OtherScreens/all_user_chat.dart';
 import 'package:social_media/OtherScreens/chat_skeleton.dart';
+import 'package:social_media/OtherScreens/chat_skeleton_grp.dart';
 import 'package:social_media/OtherScreens/group_create.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/model/recent_chat.dart';
+import 'package:social_media/model/recent_chat_grp.dart';
 
 import '../constants.dart';
 
@@ -182,24 +184,45 @@ class _MessagePageState extends State<MessagePage> {
                                       physics: BouncingScrollPhysics(),
                                       itemCount: _snap.length,
                                       itemBuilder: (context, index) {
-                                        return RecentChat(
-                                          uid: _snap[index]['ChatWith'],
-                                          lastMsg: _snap[index]['LastMsg'],
-                                          ontap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ChatSkeleton(
-                                                  senderUID: _snap[index]
-                                                      ['ChatWith'],
-                                                  chatRoomId: _snap[index]
-                                                      ['ChatRoomId'],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
+                                        return _snap[index]['IsGroup'] == "Yes"
+                                            ? RecentChatGrp(
+                                                ontap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ChatSkeletonGrp(
+                                                        chatRoomId: _snap[index]
+                                                            ['ChatRoomId'],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                lastMsg: _snap[index]
+                                                    ['LastMsg'],
+                                                grpName: _snap[index]
+                                                    ['GroupName'],
+                                                chatRoomId: _snap[index]
+                                                    ['ChatRoomId'])
+                                            : RecentChat(
+                                                uid: _snap[index]['ChatWith'],
+                                                lastMsg: _snap[index]
+                                                    ['LastMsg'],
+                                                ontap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ChatSkeleton(
+                                                        senderUID: _snap[index]
+                                                            ['ChatWith'],
+                                                        chatRoomId: _snap[index]
+                                                            ['ChatRoomId'],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
                                       });
                             }),
                       ),

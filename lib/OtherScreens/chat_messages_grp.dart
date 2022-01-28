@@ -6,17 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 
-class ChatMesssages extends StatefulWidget {
-  const ChatMesssages({Key? key, this.array, this.index, this.chatRoomId})
+class ChatMesssagesGrp extends StatefulWidget {
+  const ChatMesssagesGrp({Key? key, this.array, this.chatRoomId})
       : super(key: key);
 
-  final array, index, chatRoomId;
+  final array, chatRoomId;
 
   @override
-  _ChatMesssagesState createState() => _ChatMesssagesState();
+  _ChatMesssagesGrpState createState() => _ChatMesssagesGrpState();
 }
 
-class _ChatMesssagesState extends State<ChatMesssages> {
+class _ChatMesssagesGrpState extends State<ChatMesssagesGrp> {
   String text = "sdsadsa @yashss1", uid = "";
 
   @override
@@ -140,14 +140,14 @@ class _ChatMesssagesState extends State<ChatMesssages> {
                 width: MediaQuery.of(context).size.width,
                 child: InkWell(
                   onLongPress: () {
-                    if (map['SendBy'] == UserDetails.name)
+                    if (map['SendBy'] == UserDetails.uid)
                       handleClick(0, map['ChatId']);
                   },
                   child: chatBubble(
                     mp: map,
                     array: widget.array,
-                    index: widget.index,
-                    isSender: map['SendBy'] == UserDetails.name,
+                    userIdx: map['UserIdx'],
+                    isSender: map['SendBy'] == UserDetails.uid,
                   ),
                 ),
               );
@@ -162,7 +162,7 @@ class _ChatMesssagesState extends State<ChatMesssages> {
 }
 
 class chatBubble extends StatelessWidget {
-  final mp, array, index;
+  final mp, array, userIdx;
   final bool isSender;
   final Function()? ontap;
 
@@ -172,7 +172,7 @@ class chatBubble extends StatelessWidget {
     required this.isSender,
     this.mp,
     this.array,
-    this.index,
+    this.userIdx,
   }) : super(key: key);
 
   @override
@@ -198,7 +198,7 @@ class chatBubble extends StatelessWidget {
                                 color: Color.fromRGBO(100, 94, 94, 1),
                                 image: DecorationImage(
                                     image: CachedNetworkImageProvider(
-                                        array[index]['Info']
+                                        array[userIdx]['Info']
                                             ['ProfilePhotoUrl']),
                                     fit: BoxFit.fitWidth),
                                 borderRadius:
@@ -262,7 +262,7 @@ class chatBubble extends StatelessWidget {
                                 color: Color.fromRGBO(100, 94, 94, 1),
                                 image: DecorationImage(
                                     image: CachedNetworkImageProvider(
-                                        array[index]['Info']
+                                        array[userIdx]['Info']
                                             ['ProfilePhotoUrl']),
                                     fit: BoxFit.cover),
                                 borderRadius:
