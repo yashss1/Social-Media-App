@@ -12,6 +12,7 @@ class HashTagModel extends StatelessWidget {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
       width: deviceWidth,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

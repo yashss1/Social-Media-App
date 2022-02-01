@@ -89,7 +89,7 @@ class _EditProfileState extends State<EditProfile> {
     ImagePicker imagePicker = new ImagePicker();
     final pickedImageFile = await imagePicker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 75,
+      imageQuality: 100,
       maxWidth: 150,
     );
     setState(() {

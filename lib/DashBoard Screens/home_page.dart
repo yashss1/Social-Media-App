@@ -1,14 +1,22 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_full_image_screen/custom_full_image_screen.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/DashBoard%20Screens/search_page.dart';
 import 'package:social_media/OtherScreens/profile_page.dart';
+import 'package:social_media/OtherScreens/video_screen.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/post_model.dart';
 import 'package:social_media/model/story_model.dart';
+
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -20,6 +28,55 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController post = TextEditingController();
   bool showSpinner = false;
+  List<String> tags = [];
+
+  //Creating or Updating a particular HashTag
+  // HashTag Function (Add this PostId to that HasTag Document)
+  Future makeHashTag(String word, String postId) async {
+    word = word.substring(1);
+    word = word.toLowerCase();
+    print(word);
+    print(postId);
+
+    var _doc =
+        await FirebaseFirestore.instance.collection("HashTags").doc(word).get();
+    bool docStatus = _doc.exists;
+    print(docStatus);
+    if (docStatus == false) {
+      await FirebaseFirestore.instance.collection("HashTags").doc(word).set({
+        'Name': word,
+        'Posts': FieldValue.arrayUnion([
+          {
+            'postId': postId,
+          }
+        ])
+      });
+    } else {
+      await FirebaseFirestore.instance.collection("HashTags").doc(word).update({
+        'Posts': FieldValue.arrayUnion([
+          {
+            'postId': postId,
+          }
+        ])
+      });
+    }
+  }
+
+  //Extracting all the Hashtags
+  Future hashAdder(String value, String postId) async {
+    bool hashExist = value.contains('#');
+    if (hashExist) {
+      List<String> splitted = value.split(" ");
+      for (var item in splitted) {
+        if (item.startsWith("#")) {
+          String word = item.substring(0);
+          await makeHashTag(word, postId);
+          tags.add(word);
+        }
+      }
+    }
+    // print(tags);
+  }
 
   void addIntoFirebase() async {
     setState(() {
@@ -37,12 +94,17 @@ class _HomeState extends State<Home> {
     }).then((value) async {
       // print(value);
       var documentId = value.id;
-      FirebaseFirestore.instance.collection('Posts').doc(documentId).update({
+      await FirebaseFirestore.instance
+          .collection('Posts')
+          .doc(documentId)
+          .update({
         'postId': documentId,
-      });
-      setState(() {
-        showSpinner = false;
-        post.clear();
+      }).then((value) async {});
+      await hashAdder(post.text, documentId).then((value) {
+        setState(() {
+          showSpinner = false;
+          post.clear();
+        });
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -171,6 +233,76 @@ class _HomeState extends State<Home> {
     }
   }
 
+  //STATUS
+  bool showSpinner1 = false;
+
+  Future pickVideo() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp4'],
+    );
+    if (result == null) return null;
+    final pickedVideo = File(result.paths.first!);
+    print(pickedVideo);
+
+    setState(() {
+      showSpinner1 = true;
+    });
+
+    // //Get the Thumbnail
+    // final thumbnail = await VideoThumbnail.thumbnailData(
+    //   video: pickedVideo.path,
+    //   imageFormat: ImageFormat.JPEG,
+    //   maxWidth: 128,
+    //   // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+    //   quality: 25,
+    // );
+    // print(thumbnail);
+
+    //Upload
+    var time = DateTime.now().millisecondsSinceEpoch.toString();
+    String Time = "${time}";
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref('StatusVideo')
+        .child('$Time');
+
+    await ref.putFile(pickedVideo);
+    String videoUrl = await ref.getDownloadURL();
+    print(videoUrl);
+
+    //Now putting in Firestore
+    FirebaseFirestore.instance.collection('Status').add({
+      'createdAt': Timestamp.now(),
+      'AddedBy': UserDetails.uid,
+      'Username': UserDetails.username,
+      'VideoUrl': videoUrl,
+      'ProfilePhotoUrl': UserDetails.profilePhotoUrl,
+      'BgPhotoUrl': UserDetails.bgPhotoUrl,
+    }).then((value) async {
+      // print(value);
+      var documentId = value.id;
+      await FirebaseFirestore.instance
+          .collection('Status')
+          .doc(documentId)
+          .update({
+        'statusId': documentId,
+      }).then((value) async {});
+      await hashAdder(post.text, documentId).then((value) {
+        setState(() {
+          showSpinner1 = false;
+        });
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Status Added",
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -242,31 +374,170 @@ class _HomeState extends State<Home> {
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 15),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: const [
-                              Story1(
-                                  stry: 'assets/images/Rectangle16.png',
-                                  img: 'assets/images/Rectangle12.png'),
-                              Story1(
-                                  stry: 'assets/images/Rectangle17.png',
-                                  img: 'assets/images/Rectangle13.png'),
-                              Story1(
-                                  stry: 'assets/images/Rectangle18.png',
-                                  img: 'assets/images/Rectangle14.png'),
-                              Story1(
-                                  stry: 'assets/images/Rectangle19.png',
-                                  img: 'assets/images/Rectangle15.png'),
-                              Story1(
-                                  stry: 'assets/images/Rectangle20.png',
-                                  img: 'assets/images/Rectangle14.png'),
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    await pickVideo();
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 11),
+                                    width: 90,
+                                    height: 140,
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          width: 90,
+                                          height: 125,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                topLeft: Radius.circular(10),
+                                                topRight: Radius.circular(10),
+                                                bottomLeft: Radius.circular(10),
+                                                bottomRight:
+                                                    Radius.circular(10),
+                                              ),
+                                              border: Border.all(
+                                                  color: Colors.pink),
+                                              color: Colors.white),
+                                          child: showSpinner1 == true
+                                              ? Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 3.0,
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      Colors.pink,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Center(
+                                                  child: Icon(
+                                                  Icons.add,
+                                                  color: pink,
+                                                  size: 30,
+                                                )),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            width: 45,
+                                            height: 45,
+                                            decoration: BoxDecoration(
+                                              color: Color.fromRGBO(
+                                                  100, 94, 94, 1),
+                                              image: DecorationImage(
+                                                  image: CachedNetworkImageProvider(
+                                                      "${UserDetails.profilePhotoUrl}"),
+                                                  fit: BoxFit.cover),
+                                              borderRadius: const BorderRadius
+                                                      .all(
+                                                  Radius.elliptical(36, 36)),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  height: 160,
+                                  child: StreamBuilder(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('Status')
+                                          .orderBy('createdAt',
+                                              descending: true)
+                                          .snapshots(),
+                                      builder: (ctx,
+                                          AsyncSnapshot
+                                              notificationsSnapshots) {
+                                        if (notificationsSnapshots
+                                                .connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        final list =
+                                            notificationsSnapshots.data!.docs;
+                                        print(list);
+                                        return ListView.builder(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          physics: BouncingScrollPhysics(),
+                                          itemCount: list.length,
+                                          itemBuilder: (context, index) {
+                                            return InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        VideoScreen(
+                                                      url: list[index]
+                                                          ['VideoUrl'],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Story1(
+                                                  bg: list[index]['BgPhotoUrl'],
+                                                  img: list[index]
+                                                      ['ProfilePhotoUrl']),
+                                            );
+                                          },
+                                        );
+                                      }),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        // SingleChildScrollView(
+                        //   scrollDirection: Axis.horizontal,
+                        //   physics: BouncingScrollPhysics(),
+                        //   child: Row(
+                        //     children: [
+                        //       InkWell(
+                        //         onTap: () {
+                        //           Navigator.push(
+                        //             context,
+                        //             MaterialPageRoute(
+                        //               builder: (context) => VideoScreen(),
+                        //             ),
+                        //           );
+                        //         },
+                        //         child: Story1(
+                        //             stry: 'assets/images/Rectangle16.png',
+                        //             img: 'assets/images/Rectangle12.png'),
+                        //       ),
+                        //
+                        //       Story1(
+                        //           stry: 'assets/images/Rectangle17.png',
+                        //           img: 'assets/images/Rectangle13.png'),
+                        //       Story1(
+                        //           stry: 'assets/images/Rectangle18.png',
+                        //           img: 'assets/images/Rectangle14.png'),
+                        //       Story1(
+                        //           stry: 'assets/images/Rectangle19.png',
+                        //           img: 'assets/images/Rectangle15.png'),
+                        //       Story1(
+                        //           stry: 'assets/images/Rectangle20.png',
+                        //           img: 'assets/images/Rectangle14.png'),
+                        //     ],
+                        //   ),
+                        // ),
                         SizedBox(height: 25),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 16),

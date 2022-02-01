@@ -26,7 +26,10 @@ dependencies:
   fluttertoast: ^8.0.8
   csc_picker: ^0.2.6
   chat_bubbles: ^1.1.0
+  video_thumbnail: ^0.4.3
   image_cropper: ^1.4.0
+  chewie: ^1.2.2
+  video_player: ^2.2.16
 
   #Notification Pacakges
   firebase_messaging: ^11.2.5
