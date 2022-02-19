@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:social_media/Nav%20Drawer%20Screens/music.dart';
+import 'package:social_media/Services/notification_helper.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/friends_model.dart';
@@ -37,6 +38,8 @@ class _ProfilePageState extends State<ProfilePage> {
     bool docStatus = _doc.exists;
 
     if (docStatus == false) {
+      await NotificationHelper()
+          .getTokenForFollowing(widget.array[widget.index]['Info']['Uid']);
       FirebaseFirestore.instance
           .collection('Following')
           .doc(UserDetails.uid)
@@ -73,10 +76,14 @@ class _ProfilePageState extends State<ProfilePage> {
             'UID': widget.array[widget.index]['Info']['Uid'],
           }
         ])
-      }).then((value) {
+      }).then((value) async {
         setState(() {
           showSpinner = false;
         });
+
+        await NotificationHelper()
+            .getTokenForFollowing(widget.array[widget.index]['Info']['Uid']);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

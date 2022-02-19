@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_media/Services/notification_helper.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -21,6 +22,9 @@ class _ChatTextFieldState extends State<ChatTextField> {
 
   void onSendMessage() async {
     if (message.text.isNotEmpty) {
+      await NotificationHelper().getTokenForChatSent(
+          widget.array[widget.index]['Info']['Uid'], message.text);
+
       Map<String, dynamic> messages = {
         "SendBy": UserDetails.name,
         "Message": message.text,
@@ -62,7 +66,7 @@ class _ChatTextFieldState extends State<ChatTextField> {
         "Time": messages['Time'],
         "ChatRoomId": widget.chatRoomId,
         "ChatWith": widget.array[widget.index]['Info']['Uid'],
-        "IsGroup":"No",
+        "IsGroup": "No",
       });
 
       await FirebaseFirestore.instance
@@ -76,7 +80,7 @@ class _ChatTextFieldState extends State<ChatTextField> {
         "Time": messages['Time'],
         "ChatRoomId": widget.chatRoomId,
         "ChatWith": UserDetails.uid,
-        "IsGroup":"No",
+        "IsGroup": "No",
       });
     } else {
       print("Enter Some Text");
@@ -174,6 +178,8 @@ class _ChatTextFieldState extends State<ChatTextField> {
         "ChatWith": UserDetails.uid,
       });
 
+      await NotificationHelper().getTokenForChatSent(
+          widget.array[widget.index]['Info']['Uid'], "Photo");
       // print(imageUrl);
     }
   }
