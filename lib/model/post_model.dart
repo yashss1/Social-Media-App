@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:social_media/OtherScreens/individual_hashtag1.dart';
 import 'package:social_media/OtherScreens/individual_post.dart';
 import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
@@ -173,6 +176,19 @@ class _PostModelState extends State<PostModel> {
     }
   }
 
+  Future goToHashTag(String word) async {
+    word = word.substring(1);
+    word = word.toLowerCase();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IndividualHashtag1(
+          hashtag: word,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -315,6 +331,15 @@ class _PostModelState extends State<PostModel> {
                                 ..onTap = () async {
                                   getUserFromUsername(word).then((value) {});
                                 });
+                        } else if (word.startsWith('#')) {
+                          return TextSpan(
+                            text: '$word ',
+                            style: TextStyle(color: pink, fontSize: 17.0),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                goToHashTag(word).then((value) {});
+                              },
+                          );
                         }
                         return TextSpan(
                             text: '$word ',

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/OtherScreens/individual_hashtag2.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 import 'package:social_media/model/hashtag_model.dart';
@@ -16,13 +17,10 @@ class _HashTagState extends State<HashTag> {
   String searchField = "";
 
   bool resultData(List arr, int index, String _key) {
-    if (arr[index]['Info']['Uid'] == UserDetails.uid) return false;
-    String email = arr[index]['Info']['Name'];
-    String name = arr[index]['Info']['Username'];
-    email = email.toLowerCase();
+    String name = arr[index]['Name'];
     name = name.toLowerCase();
     _key = _key.toLowerCase();
-    if (email.contains(_key) || name.contains(_key)) return true;
+    if (name.contains(_key)) return true;
     return false;
   }
 
@@ -253,7 +251,7 @@ class _HashTagState extends State<HashTag> {
               Expanded(
                 child: StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection('HashTag')
+                        .collection('HashTags')
                         .snapshots(),
                     builder: (ctx, AsyncSnapshot snaps) {
                       if (snaps.connectionState == ConnectionState.waiting) {
@@ -290,10 +288,24 @@ class _HashTagState extends State<HashTag> {
                                             _snap, index, searchField)) ==
                                         false
                                     ? SizedBox(height: 0)
-                                    : HashTagModel(
-                                        num: (index + 1).toString(),
-                                        name: _snap[index]['Name'],
-                                        people: _snap[index]['TimesUsed'],
+                                    : InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  IndividualHashtag2(
+                                                hashtag: _snap[index]['Name'],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: HashTagModel(
+                                          num: '${(index + 1)}',
+                                          name: _snap[index]['Name'],
+                                          people:
+                                              '${_snap[index]['Posts'].length}',
+                                        ),
                                       );
                               });
                     }),

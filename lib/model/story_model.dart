@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class Story1 extends StatelessWidget {
-  const Story1({Key? key, required this.stry, required this.img})
+  const Story1({Key? key, required this.bg, required this.img})
       : super(key: key);
 
-  final String stry, img;
+  final String bg, img;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,8 @@ class Story1 extends StatelessWidget {
                 ),
                 color: const Color.fromRGBO(196, 196, 196, 1),
                 image: DecorationImage(
-                    image: AssetImage(stry), fit: BoxFit.fitHeight),
+                    image: CachedNetworkImageProvider("${bg}"),
+                    fit: BoxFit.cover),
               )),
           Align(
             alignment: Alignment.bottomCenter,
@@ -36,7 +38,8 @@ class Story1 extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(100, 94, 94, 1),
                   image: DecorationImage(
-                      image: AssetImage(img), fit: BoxFit.fitWidth),
+                      image: CachedNetworkImageProvider("${img}"),
+                      fit: BoxFit.cover),
                   borderRadius:
                       const BorderRadius.all(Radius.elliptical(36, 36)),
                 )),

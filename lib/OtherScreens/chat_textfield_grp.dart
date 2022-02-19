@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_media/Services/notification_helper.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -20,6 +21,8 @@ class ChatTextFieldGrp extends StatefulWidget {
 class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
   TextEditingController message = TextEditingController();
 
+  String msg = "";
+
   void onSendMessage() async {
     if (message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
@@ -31,7 +34,7 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
         "IsGroup": "Yes",
         "UserIdx": widget.myIndex,
       };
-
+      msg = message.text;
       message.clear();
       var chatId;
       await FirebaseFirestore.instance
@@ -69,6 +72,9 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
         if (widget.myIndex == i)
           continue;
         else {
+          await NotificationHelper()
+              .getTokenForChatSent(widget.array[i]['Info']['Uid'], msg);
+
           await FirebaseFirestore.instance
               .collection("Users")
               .doc(widget.array[i]['Info']['Uid'])
@@ -176,6 +182,9 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
         if (widget.myIndex == i)
           continue;
         else {
+          await NotificationHelper()
+              .getTokenForChatSent(widget.array[i]['Info']['Uid'], "Photo");
+
           await FirebaseFirestore.instance
               .collection("Users")
               .doc(widget.array[i]['Info']['Uid'])
