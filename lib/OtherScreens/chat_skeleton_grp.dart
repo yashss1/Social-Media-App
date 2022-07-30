@@ -45,7 +45,7 @@ class _ChatSkeletonGrpState extends State<ChatSkeletonGrp> {
             .doc(memberList[i]['UID'])
             .get();
 
-        if(memberList[i]['UID']==UserDetails.uid){
+        if (memberList[i]['UID'] == UserDetails.uid) {
           myIndex = i;
         }
         array.add(_doc);
@@ -107,7 +107,7 @@ class _ChatSkeletonGrpState extends State<ChatSkeletonGrp> {
                                     color: Colors.black,
                                   ),
                                 ),
-                                SizedBox(width: 25),
+                                SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -179,8 +179,8 @@ class _ChatSkeletonGrpState extends State<ChatSkeletonGrp> {
                       ),
                       Container(
                         child: ChatTextFieldGrp(
-                          myIndex : myIndex,
-                          grpName : grpName,
+                          myIndex: myIndex,
+                          grpName: grpName,
                           array: array,
                           chatRoomId: widget.chatRoomId,
                         ),
