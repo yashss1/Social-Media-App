@@ -5,6 +5,7 @@ import 'package:social_media/DashBoard%20Screens/navigation_drawer.dart';
 import 'package:social_media/DashBoard%20Screens/search_page.dart';
 import 'package:social_media/DashBoard%20Screens/user_page.dart';
 import 'package:social_media/constants.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,6 +27,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+    ));
 
     return SafeArea(
       child: Scaffold(
