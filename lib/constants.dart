@@ -50,3 +50,14 @@ const kTextFieldDecoration = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
 );
+
+TextStyle myStyle(double size, String fontFamily,
+    {Color? color, FontWeight fw = FontWeight.w700, List<Shadow>? l}) {
+  return TextStyle(
+    fontSize: size,
+    fontWeight: fw,
+    color: color != "" ? color : Colors.black,
+    fontFamily: fontFamily,
+    shadows: l,
+  );
+}

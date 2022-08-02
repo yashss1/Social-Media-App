@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ShopCategory extends StatelessWidget {
@@ -28,7 +29,8 @@ class ShopCategory extends StatelessWidget {
               ),
               color: Color.fromRGBO(196, 196, 196, 1),
               image: DecorationImage(
-                  image: AssetImage(img), fit: BoxFit.fitHeight),
+                  image: CachedNetworkImageProvider("${img}"),
+                  fit: BoxFit.cover),
             ),
           ),
           SizedBox(height: 10),
