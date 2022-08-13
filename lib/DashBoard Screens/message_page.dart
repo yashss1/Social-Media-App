@@ -157,7 +157,9 @@ class _MessagePageState extends State<MessagePage> {
                                   child: CircularProgressIndicator(),
                                 );
                               }
+
                               final _snap = snaps.data!.docs;
+                              // print(_snap.length);
                               return _snap.length == 0
                                   ? Container(
                                       width: MediaQuery.of(context).size.width,
@@ -203,7 +205,16 @@ class _MessagePageState extends State<MessagePage> {
                                                 grpName: _snap[index]
                                                     ['GroupName'],
                                                 chatRoomId: _snap[index]
-                                                    ['ChatRoomId'])
+                                                    ['ChatRoomId'],
+                                                lastMsgTime: _snap[index]
+                                                        ['Time']
+                                                    .toDate(),
+                                              )
+                                            // ? Container(
+                                            //     width: 50,
+                                            //     height: 50,
+                                            //     color: Colors.red,
+                                            //   )
                                             : RecentChat(
                                                 uid: _snap[index]['ChatWith'],
                                                 lastMsg: _snap[index]
@@ -222,6 +233,9 @@ class _MessagePageState extends State<MessagePage> {
                                                     ),
                                                   );
                                                 },
+                                                lastMsgTime: _snap[index]
+                                                        ['Time']
+                                                    .toDate(),
                                               );
                                       });
                             }),
