@@ -30,6 +30,7 @@ dependencies:
   image_cropper:
   path_provider: ^2.0.11
   chewie:
+  audioplayers: ^1.0.1
   video_player:
   flutter_html:
 

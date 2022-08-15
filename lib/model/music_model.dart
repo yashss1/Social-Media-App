@@ -30,7 +30,7 @@ class MusicModel extends StatelessWidget {
               ),
               color: Color.fromRGBO(196, 196, 196, 1),
               image: DecorationImage(
-                  image: AssetImage(img), fit: BoxFit.fitHeight),
+                  image: NetworkImage("${img}"), fit: BoxFit.cover),
             ),
           ),
           SizedBox(height: 13),
