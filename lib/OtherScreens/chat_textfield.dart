@@ -21,7 +21,7 @@ class _ChatTextFieldState extends State<ChatTextField> {
   TextEditingController message = TextEditingController();
 
   void onSendMessage() async {
-    if (message.text.isNotEmpty) {
+    if (message.text.isNotEmpty && message.text.length != 0) {
       await NotificationHelper().getTokenForChatSent(
           widget.array[widget.index]['Info']['Uid'], message.text);
 

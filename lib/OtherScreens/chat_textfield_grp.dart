@@ -23,10 +23,10 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
 
   String msg = "";
 
-  void onSendMessage() async {
-    if (message.text.isNotEmpty) {
+  Future onSendMessage() async {
+    if (msg.isNotEmpty && msg.length != 0) {
       Map<String, dynamic> messages = {
-        "Message": message.text,
+        "Message": msg,
         "SendBy": UserDetails.uid,
         "Type": "Text",
         "Time": FieldValue.serverTimestamp(),
@@ -34,8 +34,6 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
         "IsGroup": "Yes",
         "UserIdx": widget.myIndex,
       };
-      msg = message.text;
-      message.clear();
       var chatId;
       await FirebaseFirestore.instance
           .collection('ChatRooms')
@@ -44,6 +42,8 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
           .add(messages)
           .then((value) {
         chatId = value.id;
+      }).then((value) {
+        // message.clear();
       });
 
       await FirebaseFirestore.instance
@@ -60,7 +60,7 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
           .doc(widget.chatRoomId)
           .set({
         "GroupName": widget.grpName,
-        "LastMsg": message.text,
+        "LastMsg": msg,
         "Type": "Normal Message",
         "Time": FieldValue.serverTimestamp(),
         "ChatRoomId": widget.chatRoomId,
@@ -69,12 +69,10 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
 
       //for loop lav for all members except u
       for (int i = 0; i < widget.array.length; i++) {
+        print(msg);
         if (widget.myIndex == i)
           continue;
         else {
-          await NotificationHelper()
-              .getTokenForChatSent(widget.array[i]['Info']['Uid'], msg);
-
           await FirebaseFirestore.instance
               .collection("Users")
               .doc(widget.array[i]['Info']['Uid'])
@@ -82,12 +80,15 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
               .doc(widget.chatRoomId)
               .set({
             "GroupName": widget.grpName,
-            "LastMsg": message.text,
+            "LastMsg": msg,
             "Type": "Normal Message",
             "Time": FieldValue.serverTimestamp(),
             "ChatRoomId": widget.chatRoomId,
             "IsGroup": "Yes",
           });
+
+          await NotificationHelper()
+              .getTokenForChatSent(widget.array[i]['Info']['Uid'], msg);
         }
       }
     } else {
@@ -343,7 +344,9 @@ class _ChatTextFieldGrpState extends State<ChatTextFieldGrp> {
           ),
           IconButton(
             onPressed: () async {
-              onSendMessage();
+              msg = message.text;
+              message.clear();
+              await onSendMessage();
             },
             icon: const Icon(
               Icons.send,

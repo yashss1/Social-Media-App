@@ -6,6 +6,8 @@ import 'package:social_media/OtherScreens/chat_textfield.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 
+import 'call_screen.dart';
+
 class ChatSkeleton extends StatefulWidget {
   const ChatSkeleton({Key? key, this.chatRoomId, this.senderUID})
       : super(key: key);
@@ -126,7 +128,13 @@ class _ChatSkeletonState extends State<ChatSkeleton> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CallScreens(),
+                                        ));
+                                  },
                                   icon: const Icon(
                                     Icons.call,
                                     color: Colors.pink,
@@ -134,7 +142,13 @@ class _ChatSkeletonState extends State<ChatSkeleton> {
                                 ),
                                 SizedBox(width: 25),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CallScreens(),
+                                        ));
+                                  },
                                   icon: const Icon(
                                     Icons.video_call,
                                     color: Colors.pink,

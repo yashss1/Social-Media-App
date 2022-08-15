@@ -28,6 +28,7 @@ dependencies:
   chat_bubbles:
   video_thumbnail: ^0.5.2
   image_cropper:
+  path_provider: ^2.0.11
   chewie:
   video_player:
   flutter_html:
@@ -50,7 +51,7 @@ flutter:
   uses-material-design: true
 
   assets:
-     - assets/images/
+    - assets/images/
 
 
   fonts:
