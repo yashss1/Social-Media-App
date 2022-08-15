@@ -11,6 +11,8 @@ import 'package:social_media/OtherScreens/profile_page.dart';
 import 'package:social_media/Services/user_details.dart';
 import 'package:social_media/constants.dart';
 
+import '../DashBoard Screens/user_page.dart';
+
 class PostModel extends StatefulWidget {
   const PostModel({Key? key, this.array, this.index}) : super(key: key);
 
@@ -213,6 +215,12 @@ class _PostModelState extends State<PostModel> {
                   if (docStatus1 == true) {
                     array.add(_doc1);
                     if (array[0]['Info']['Uid'] == UserDetails.uid) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserPage(),
+                        ),
+                      );
                     } else {
                       Navigator.push(
                         context,

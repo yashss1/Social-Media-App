@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/DashBoard%20Screens/home.dart';
+import 'package:social_media/OtherScreens/call_screen.dart';
 import 'package:social_media/OtherScreens/chat_messages.dart';
 import 'package:social_media/OtherScreens/chat_messages_grp.dart';
 import 'package:social_media/OtherScreens/chat_textfield.dart';
@@ -144,7 +145,13 @@ class _ChatSkeletonGrpState extends State<ChatSkeletonGrp> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CallScreens(),
+                                        ));
+                                  },
                                   icon: const Icon(
                                     Icons.call,
                                     color: Colors.pink,
@@ -152,7 +159,13 @@ class _ChatSkeletonGrpState extends State<ChatSkeletonGrp> {
                                 ),
                                 SizedBox(width: 25),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CallScreens(),
+                                        ));
+                                  },
                                   icon: const Icon(
                                     Icons.video_call,
                                     color: Colors.pink,
