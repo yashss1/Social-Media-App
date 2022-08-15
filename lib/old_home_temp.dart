@@ -1,415 +1,171 @@
-// import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-// import 'package:social_media/DashBoard%20Screens/search_page.dart';
-// import 'package:social_media/OtherScreens/profile_page.dart';
-// import 'package:social_media/Services/user_details.dart';
-// import 'package:social_media/constants.dart';
-// import 'package:social_media/model/post_model.dart';
-// import 'package:social_media/model/story_model.dart';
+// import 'dart:typed_data';
 //
-// class Home extends StatefulWidget {
-//   const Home({Key? key}) : super(key: key);
+// import 'package:audioplayers/audioplayers.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+//
+// class IndividualAudioScreen extends StatefulWidget {
+//   const IndividualAudioScreen({Key? key}) : super(key: key);
 //
 //   @override
-//   _HomeState createState() => _HomeState();
+//   State<IndividualAudioScreen> createState() => _IndividualAudioScreenState();
 // }
 //
-// class _HomeState extends State<Home> {
-//   TextEditingController post = TextEditingController();
-//   bool showSpinner = false;
+// class _IndividualAudioScreenState extends State<IndividualAudioScreen> {
+//   int maxduration = 100;
 //
-//   void addIntoFirebase() async {
-//     setState(() {
-//       showSpinner = true;
+//   int currentpos = 0;
+//
+//   String currentpostlabel = "00:00";
+//
+//   String audioasset = "assets/audio/red-indian-music.mp3";
+//
+//   bool isplaying = false;
+//
+//   bool audioplayed = false;
+//
+//   late Uint8List audiobytes;
+//
+//   AudioPlayer player = AudioPlayer();
+//
+//   @override
+//   void initState() {
+//     Future.delayed(Duration.zero, () async {
+//
+//       ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+//       audiobytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+//       //convert ByteData to Uint8List
+//
+//       player.onDurationChanged.listen((Duration d) { //get the duration of audio
+//         maxduration = d.inMilliseconds;
+//         setState(() {
+//
+//         });
+//       });
+//
+//       player.onDurationChanged.listen((Duration  p){
+//         currentpos = p.inMilliseconds; //get the current position of playing audio
+//
+//         //generating the duration label
+//         int shours = Duration(milliseconds:currentpos).inHours;
+//         int sminutes = Duration(milliseconds:currentpos).inMinutes;
+//         int sseconds = Duration(milliseconds:currentpos).inSeconds;
+//
+//         int rhours = shours;
+//         int rminutes = sminutes - (shours * 60);
+//         int rseconds = sseconds - (sminutes * 60 + shours * 60 * 60);
+//
+//         currentpostlabel = "$rhours:$rminutes:$rseconds";
+//
+//         setState(() {
+//           //refresh the UI
+//         });
+//       });
+//
 //     });
-//
-//     var _doc = await FirebaseFirestore.instance
-//         .collection("Posts")
-//         .doc(UserDetails.uid)
-//         .get();
-//     bool docStatus = _doc.exists;
-//     // print(docStatus);
-//     if (docStatus == false) {
-//       FirebaseFirestore.instance.collection('Posts').doc(UserDetails.uid).set({
-//         'Posts': FieldValue.arrayUnion([
-//           {
-//             'Name': UserDetails.name,
-//             'Uid': UserDetails.uid,
-//             'ProfilePhotoUrl': UserDetails.profilePhotoUrl,
-//             'UserName': UserDetails.username,
-//             'Post': post.text,
-//             'LikeType': 0,
-//             'createdAt': Timestamp.now(),
-//           }
-//         ])
-//       }).then((value) {
-//         setState(() {
-//           showSpinner = false;
-//         });
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text(
-//               "Post Added",
-//               style: TextStyle(fontSize: 16),
-//             ),
-//           ),
-//         );
-//       });
-//     } else {
-//       FirebaseFirestore.instance
-//           .collection('Posts')
-//           .doc(UserDetails.uid)
-//           .update({
-//         'Posts': FieldValue.arrayUnion([
-//           {
-//             'Name': UserDetails.name,
-//             'Uid': UserDetails.uid,
-//             'ProfilePhotoUrl': UserDetails.profilePhotoUrl,
-//             'UserName': UserDetails.username,
-//             'Post': post.text,
-//             'LikeType': 0,
-//             'createdAt': Timestamp.now(),
-//           }
-//         ])
-//       }).then((value) {
-//         setState(() {
-//           post.clear();
-//           showSpinner = false;
-//         });
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text(
-//               "Post Added",
-//               style: TextStyle(fontSize: 16),
-//             ),
-//           ),
-//         );
-//       });
-//     }
+//     super.initState();
 //   }
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     final deviceWidth = MediaQuery.of(context).size.width;
-//     final deviceHeight = MediaQuery.of(context).size.height;
 //     return Scaffold(
-//       body: ModalProgressHUD(
-//         inAsyncCall: showSpinner,
-//         child: Container(
-//           width: deviceWidth,
-//           height: deviceHeight,
-//           child: Column(
-//             children: [
-//               Container(
-//                 padding: EdgeInsets.symmetric(horizontal: 16),
-//                 width: deviceWidth,
-//                 height: 70,
-//                 color: Colors.white,
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         backgroundColor: Colors.white,
+//         body: Column(
+//           children: [
+//             Container(
+//                 margin: EdgeInsets.only(top:50),
+//                 child: Column(
 //                   children: [
-//                     InkWell(
-//                       splashColor: Colors.pink,
-//                       onTap: () {
-//                         Scaffold.of(context).openDrawer();
-//                       },
-//                       child: const Icon(
-//                         Icons.notes,
-//                         size: 28,
-//                       ),
+//
+//                     Container(
+//                       child: Text(currentpostlabel, style: TextStyle(fontSize: 25),),
 //                     ),
-//                     const Text(
-//                       'Signature',
-//                       textAlign: TextAlign.left,
-//                       style: TextStyle(
-//                           color: Color.fromRGBO(255, 79, 90, 1),
-//                           fontFamily: 'Lato',
-//                           fontSize: 23,
-//                           letterSpacing:
-//                           0 /*percentages not used in flutter. defaulting to zero*/,
-//                           fontWeight: FontWeight.normal,
-//                           height: 1),
+//
+//                     Container(
+//                         child: Slider(
+//                           value: double.parse(currentpos.toString()),
+//                           min: 0,
+//                           max: double.parse(maxduration.toString()),
+//                           divisions: maxduration,
+//                           label: currentpostlabel,
+//                           onChanged: (double value) async {
+//                             int seekval = value.round();
+//                             int result = await player.seek(Duration(milliseconds: seekval));
+//                             if(result == 1){ //seek successful
+//                               currentpos = seekval;
+//                             }else{
+//                               print("Seek unsuccessful.");
+//                             }
+//                           },
+//                         )
 //                     ),
-//                     Row(
-//                       children: [
-//                         const Icon(
-//                           Icons.notifications_none,
-//                           size: 30,
-//                         ),
-//                         SizedBox(width: 10),
-//                         Container(
-//                             width: 34.14285659790039,
-//                             height: 32.590911865234375,
-//                             decoration: BoxDecoration(
-//                               color: Color.fromRGBO(196, 196, 196, 1),
-//                               image: DecorationImage(
-//                                   image: CachedNetworkImageProvider(
-//                                       "${UserDetails.profilePhotoUrl}"),
-//                                   fit: BoxFit.fitWidth),
-//                               borderRadius: BorderRadius.all(Radius.elliptical(
-//                                   34.14285659790039, 32.590911865234375)),
-//                             ))
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Expanded(
-//                 child: Container(
-//                   child: SingleChildScrollView(
-//                     physics: BouncingScrollPhysics(),
-//                     child: Column(
-//                       children: [
-//                         SizedBox(height: 15),
-//                         SingleChildScrollView(
-//                           scrollDirection: Axis.horizontal,
-//                           physics: const BouncingScrollPhysics(),
-//                           child: Row(
-//                             children: const [
-//                               Story1(
-//                                   stry: 'assets/images/Rectangle16.png',
-//                                   img: 'assets/images/Rectangle12.png'),
-//                               Story1(
-//                                   stry: 'assets/images/Rectangle17.png',
-//                                   img: 'assets/images/Rectangle13.png'),
-//                               Story1(
-//                                   stry: 'assets/images/Rectangle18.png',
-//                                   img: 'assets/images/Rectangle14.png'),
-//                               Story1(
-//                                   stry: 'assets/images/Rectangle19.png',
-//                                   img: 'assets/images/Rectangle15.png'),
-//                               Story1(
-//                                   stry: 'assets/images/Rectangle20.png',
-//                                   img: 'assets/images/Rectangle14.png'),
-//                             ],
-//                           ),
-//                         ),
-//                         SizedBox(height: 25),
-//                         Container(
-//                           margin: EdgeInsets.symmetric(horizontal: 16),
-//                           width: deviceWidth,
-//                           decoration: BoxDecoration(
-//                             borderRadius: const BorderRadius.only(
-//                               topLeft: Radius.circular(10),
-//                               topRight: Radius.circular(10),
-//                               bottomLeft: Radius.circular(10),
-//                               bottomRight: Radius.circular(10),
-//                             ),
-//                             border: Border.all(
-//                               color: const Color.fromRGBO(0, 0, 0, 1),
-//                               width: 1,
-//                             ),
-//                           ),
-//                           child: Column(
-//                             children: [
-//                               Row(
-//                                 mainAxisAlignment: MainAxisAlignment.start,
-//                                 children: [
-//                                   Container(
-//                                       margin: const EdgeInsets.only(
-//                                           left: 20,
-//                                           right: 50,
-//                                           top: 15,
-//                                           bottom: 15),
-//                                       width: 52,
-//                                       height: 52,
-//                                       decoration: BoxDecoration(
-//                                         color: Color.fromRGBO(100, 94, 94, 1),
-//                                         image: DecorationImage(
-//                                             image: CachedNetworkImageProvider(
-//                                                 "${UserDetails.profilePhotoUrl}"),
-//                                             fit: BoxFit.fitWidth),
-//                                         borderRadius: BorderRadius.all(
-//                                             Radius.elliptical(52, 52)),
-//                                       )),
-//                                   Container(
-//                                     width: deviceWidth * .55,
-//                                     child: TextField(
-//                                       controller: post,
-//                                       textAlign: TextAlign.left,
-//                                       maxLines: 3,
-//                                       decoration: InputDecoration(
-//                                         hintText: "Something in your mind",
-//                                       ),
-//                                       style: TextStyle(
-//                                           color: Color.fromRGBO(
-//                                               0, 0, 0, 0.4699999988079071),
-//                                           fontFamily: 'Lato',
-//                                           fontSize: 18,
-//                                           letterSpacing:
-//                                           0 /*percentages not used in flutter. defaulting to zero*/,
-//                                           fontWeight: FontWeight.normal,
-//                                           height: 1),
-//                                     ),
-//                                   )
-//                                 ],
-//                               ),
-//                               SizedBox(height: 25),
-//                               // Row(
-//                               //   mainAxisAlignment: MainAxisAlignment.center,
-//                               //   children: const [
-//                               //     Text(
-//                               //       '😃',
-//                               //       style: TextStyle(fontSize: 25),
-//                               //     ),
-//                               //     SizedBox(width: 5),
-//                               //     Text(
-//                               //       '😍',
-//                               //       style: TextStyle(fontSize: 25),
-//                               //     ),
-//                               //     SizedBox(width: 5),
-//                               //     Text(
-//                               //       '😡',
-//                               //       style: TextStyle(fontSize: 25),
-//                               //     ),
-//                               //     SizedBox(width: 5),
-//                               //     Text(
-//                               //       '👍',
-//                               //       style: TextStyle(fontSize: 25),
-//                               //     ),
-//                               //     SizedBox(width: 5),
-//                               //     Text(
-//                               //       '👎',
-//                               //       style: TextStyle(fontSize: 25),
-//                               //     ),
-//                               //   ],
-//                               // ),
-//                               // SizedBox(height: 20),
-//                             ],
-//                           ),
-//                         ),
-//                         Padding(
-//                           padding: const EdgeInsets.all(16.0),
-//                           child: Row(
-//                             mainAxisAlignment: MainAxisAlignment.end,
-//                             children: [
-//                               InkWell(
-//                                 onTap: () async {
-//                                   if (post.text == null ||
-//                                       post.text.length == 0) {
-//                                     ScaffoldMessenger.of(context).showSnackBar(
-//                                       SnackBar(
-//                                         content: Text(
-//                                           "Please Write a Post",
-//                                           style: TextStyle(fontSize: 16),
-//                                         ),
-//                                       ),
-//                                     );
-//                                   } else {
-//                                     addIntoFirebase();
+//
+//                     Container(
+//                       child: Wrap(
+//                         spacing: 10,
+//                         children: [
+//                           ElevatedButton.icon(
+//                               onPressed: () async {
+//                                 if(!isplaying && !audioplayed){
+//                                   int result = await player.playBytes(audiobytes);
+//                                   if(result == 1){ //play success
+//                                     setState(() {
+//                                       isplaying = true;
+//                                       audioplayed = true;
+//                                     });
+//                                   }else{
+//                                     print("Error while playing audio.");
 //                                   }
-//                                 },
-//                                 child: Container(
-//                                   width: 107,
-//                                   height: 40,
-//                                   decoration: const BoxDecoration(
-//                                     borderRadius: BorderRadius.only(
-//                                       topLeft: Radius.circular(6),
-//                                       topRight: Radius.circular(6),
-//                                       bottomLeft: Radius.circular(6),
-//                                       bottomRight: Radius.circular(6),
-//                                     ),
-//                                     color: Color.fromRGBO(
-//                                         255, 79, 90, 0.800000011920929),
-//                                   ),
-//                                   child: const Align(
-//                                     alignment: Alignment.center,
-//                                     child: Text(
-//                                       'Publish',
-//                                       textAlign: TextAlign.left,
-//                                       style: TextStyle(
-//                                           color:
-//                                           Color.fromRGBO(255, 255, 255, 1),
-//                                           fontFamily: 'Lato',
-//                                           fontSize: 20,
-//                                           letterSpacing:
-//                                           0 /*percentages not used in flutter. defaulting to zero*/,
-//                                           fontWeight: FontWeight.normal,
-//                                           height: 1),
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ),
-//                             ],
+//                                 }else if(audioplayed && !isplaying){
+//                                   int result = await player.resume();
+//                                   if(result == 1){ //resume success
+//                                     setState(() {
+//                                       isplaying = true;
+//                                       audioplayed = true;
+//                                     });
+//                                   }else{
+//                                     print("Error on resume audio.");
+//                                   }
+//                                 }else{
+//                                   int result = await player.pause();
+//                                   if(result == 1){ //pause success
+//                                     setState(() {
+//                                       isplaying = false;
+//                                     });
+//                                   }else{
+//                                     print("Error on pause audio.");
+//                                   }
+//                                 }
+//                               },
+//                               icon: Icon(isplaying?Icons.pause:Icons.play_arrow),
+//                               label:Text(isplaying?"Pause":"Play")
 //                           ),
-//                         ),
-//                         SizedBox(height: 25),
-//                         CommentModel(),
-//                         StreamBuilder(
-//                             stream: FirebaseFirestore.instance
-//                                 .collection('Users')
-//                                 .snapshots(),
-//                             builder: (ctx, AsyncSnapshot snaps) {
-//                               if (snaps.connectionState ==
-//                                   ConnectionState.waiting) {
-//                                 return Center(
-//                                   child: CircularProgressIndicator(),
-//                                 );
-//                               }
-//                               final _snap = snaps.data!.docs;
-//                               return _snap.length == 0
-//                                   ? Container(
-//                                 color: Colors.pink,
-//                                 width: MediaQuery.of(context).size.width,
-//                                 padding: EdgeInsets.only(
-//                                   top:
-//                                   MediaQuery.of(context).size.height *
-//                                       .3,
-//                                 ),
-//                                 child: Column(
-//                                   children: [
-//                                     Text(
-//                                       "WE'RE SORRY",
-//                                     ),
-//                                     Center(
-//                                       child: Text(
-//                                         "There is Nothing here...",
-//                                         textAlign: TextAlign.center,
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               )
-//                                   : Container(
-//                                 height:
-//                                 MediaQuery.of(context).size.height,
-//                                 child: ListView.builder(
-//                                     physics: BouncingScrollPhysics(),
-//                                     itemCount: _snap.length,
-//                                     itemBuilder: (context, index) {
-//                                       return item(
-//                                         image: _snap[index]['Info']
-//                                         ['ProfilePhotoUrl'],
-//                                         name: _snap[index]['Info']
-//                                         ['Name'],
-//                                         username: _snap[index]['Info']
-//                                         ['Username'],
-//                                         ontap: () {
-//                                           Navigator.push(
-//                                               context,
-//                                               MaterialPageRoute(
-//                                                   builder: (context) =>
-//                                                       ProfilePage(
-//                                                         array: _snap,
-//                                                         index: index,
-//                                                       )));
-//                                         },
-//                                       );
-//                                     }),
-//                               );
-//                             }),
-//                         SizedBox(height: 100),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
+//
+//                           ElevatedButton.icon(
+//                               onPressed: () async {
+//                                 int result = await player.stop();
+//                                 if(result == 1){ //stop success
+//                                   setState(() {
+//                                     isplaying = false;
+//                                     audioplayed = false;
+//                                     currentpos = 0;
+//                                   });
+//                                 }else{
+//                                   print("Error on stop audio.");
+//                                 }
+//                               },
+//                               icon: Icon(Icons.stop),
+//                               label:Text("Stop")
+//                           ),
+//                         ],
+//                       ),
+//                     )
+//
+//                   ],
+//                 )
+//
+//             )
+//           ],
+//         ));
 //   }
 // }

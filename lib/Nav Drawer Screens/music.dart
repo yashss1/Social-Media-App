@@ -1,7 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/OtherScreens/add_music.dart';
 import 'package:social_media/model/music_model.dart';
 import 'package:social_media/model/top_artist_model.dart';
+import 'package:social_media/old_home_temp.dart';
+
+import '../OtherScreens/individual_audio_screen.dart';
+import '../constants.dart';
 
 class Music extends StatefulWidget {
   const Music({Key? key}) : super(key: key);
@@ -17,6 +23,22 @@ class _MusicState extends State<Music> {
     final deviceHeight = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: InkWell(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AddMusic()));
+          },
+          child: Container(
+            height: 65,
+            width: 65,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: pink),
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+        ),
         body: Container(
           width: deviceWidth,
           height: deviceHeight,
@@ -124,34 +146,83 @@ class _MusicState extends State<Music> {
                             )
                           ],
                         ),
-                        SingleChildScrollView(
-                          physics: BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: const [
-                              MusicModel(
-                                  img: 'assets/images/Rectangle91 (1).png',
-                                  album_name: 'See you again',
-                                  singer: 'Wiz Khalifa'),
-                              MusicModel(
-                                  img: 'assets/images/Rectangle92(1).png',
-                                  album_name: 'Sorry',
-                                  singer: 'Justin Bieber'),
-                              MusicModel(
-                                  img: 'assets/images/Rectangle93(1).png',
-                                  album_name: 'Uptown Funk',
-                                  singer: 'Mark Ronson'),
-                              MusicModel(
-                                  img: 'assets/images/Rectangle91 (1).png',
-                                  album_name: 'See you again',
-                                  singer: 'Wiz Khalifa'),
-                              MusicModel(
-                                  img: 'assets/images/Rectangle92(1).png',
-                                  album_name: 'Sorry',
-                                  singer: 'Justin Bieber'),
-                            ],
-                          ),
+                        Container(
+                          height: 200,
+                          child: StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('MusicPost')
+                                  .orderBy('createdAt', descending: true)
+                                  .snapshots(),
+                              builder:
+                                  (ctx, AsyncSnapshot notificationsSnapshots) {
+                                if (notificationsSnapshots.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                final list = notificationsSnapshots.data!.docs;
+                                print(list);
+                                return Row(
+                                  children: [
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: BouncingScrollPhysics(),
+                                      itemCount: list.length,
+                                      itemBuilder: (context, index) {
+                                        return InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      IndividualAudioScreen(
+                                                        index: index,
+                                                        array: list,
+                                                      )),
+                                            );
+                                          },
+                                          child: MusicModel(
+                                              img: list[index]['MusicImage'],
+                                              album_name: list[index]
+                                                  ['MusicName'],
+                                              singer: list[index]['Singer']),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }),
                         ),
+                        // SingleChildScrollView(
+                        //   physics: BouncingScrollPhysics(),
+                        //   scrollDirection: Axis.horizontal,
+                        //   child: Row(
+                        //     children: const [
+                        //       MusicModel(
+                        //           img: 'assets/images/Rectangle91 (1).png',
+                        //           album_name: 'See you again',
+                        //           singer: 'Wiz Khalifa'),
+                        //       MusicModel(
+                        //           img: 'assets/images/Rectangle92(1).png',
+                        //           album_name: 'Sorry',
+                        //           singer: 'Justin Bieber'),
+                        //       MusicModel(
+                        //           img: 'assets/images/Rectangle93(1).png',
+                        //           album_name: 'Uptown Funk',
+                        //           singer: 'Mark Ronson'),
+                        //       MusicModel(
+                        //           img: 'assets/images/Rectangle91 (1).png',
+                        //           album_name: 'See you again',
+                        //           singer: 'Wiz Khalifa'),
+                        //       MusicModel(
+                        //           img: 'assets/images/Rectangle92(1).png',
+                        //           album_name: 'Sorry',
+                        //           singer: 'Justin Bieber'),
+                        //     ],
+                        //   ),
+                        // ),
                         SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
