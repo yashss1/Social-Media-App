@@ -1,8 +1,6 @@
 # Social-Media-App-Demo
 
 ### March-21 
-
-  This app was a part of my internship project where I developed the frontend which was provided on Figma and also wrote the code for complete backend of the app.
   This is social media application where users can post, chat with friends, group chat, make friends, follow other people, add status, shop, comment, also include global hashtags or tag any the friends.
 
  ## Register/Login 
